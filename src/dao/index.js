@@ -26,7 +26,7 @@ export const UserDAO = MongoUserDao;
 //Iniciar persistencia en memoria (npm start memory)
 //Iniciar persistencia en mongo (npm start mongo)
 export const ProductDAO =
-persistence.toUpperCase() === "MEMORY" ? MemoryProductDao : MongoProductDao;
+persistence === "MEMORY" ? MemoryProductDao : MongoProductDao;
 export const CartDAO =
-persistence.toUpperCase() === "MEMORY" ? MemoryCartDao : MongoCartDao;
+persistence === "MEMORY" ? MemoryCartDao : MongoCartDao;
 /*PERSISTENCIA EN MEMORIA SOLO ADMITE CRUD*/
