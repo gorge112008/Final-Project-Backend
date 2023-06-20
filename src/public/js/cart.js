@@ -289,13 +289,18 @@ async function validateStock(idProduct, stockModif, action) {
 }
 
 async function validateCartStock(idCart) {
+  console.log("LLEGA?");
   const listProducts = await getDataProductsbyID(idCart);
-  for (const product of listProducts) {
-    const idProduct = product.product._id;
-    const stockModif = product.quantity;
-    const action = 1;
-    await validateStock(idProduct, stockModif, action);
+  console.log("INICIA"+JSON.stringify(listProducts));
+  if (listProducts) {
+    for (const product of listProducts) {
+      const idProduct = product.product._id;
+      const stockModif = product.quantity;
+      const action = 1;
+      await validateStock(idProduct, stockModif, action);
+    }
   }
+  console.log("sale");
 }
 
 async function validatePayload(payload, listProducts) {
@@ -650,6 +655,7 @@ async function getDataCartsbyID(id) {
     mode: "cors",
   });
   const data = await response.json();
+  console.log("data"+JSON.stringify(data));
   return data;
 }
 

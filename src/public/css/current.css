@@ -1,0 +1,81 @@
+.CurrentUserDinamic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: auto;
+  height: 86vh;
+}
+.currentTitle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  height: 10vh;
+  width:80vw;
+  top: -8vh;
+}
+
+.currentTitle h1 {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 2rem;
+  color: rgb(0, 0, 149);
+}
+
+.currentContain {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40vh;
+  width: 90vw;
+  font-size: 1.2rem;
+}
+
+.currentContain ul {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  padding: 20px;
+  padding-left: 10px;
+  border: dashed rgb(87, 0, 0) 1px;
+  padding: 20px;
+  border-radius: 20px;
+}
+
+.currentContain ul u {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 20px;
+  padding-left: 10px;
+  color: rgb(40, 200, 40);
+  font-size: 1.5rem;
+}
+
+.currentContain li {
+  align-items: end;
+  justify-content: center;
+  padding: 20px;
+  padding-left: 10px;
+}
+
+.currentContain li b{
+    color: blueviolet;
+  }
+
+.currentContain li p{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight:500px;
+    padding-top: 10px;
+    border-bottom:solid rgb(4, 148, 126) 2px;
+  }
+
+  @media only screen and (min-width: 69rem) {
+    /*DEVICE LAP CURRENT BLOCK*/
+    .currentTitle {
+        justify-content: center;
+      }
+  }

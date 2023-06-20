@@ -2,9 +2,10 @@
 /**********************************************************CONSTANTES/VARIABLES*************************************************************/
 const socket = io();
 let URLorigin = window.location.origin,
+  UrlP1 = URLorigin + "/api/productOne",
   UrlP = URLorigin + "/api/products",
-  UrlC = URLorigin + "/api/carts";
-UrlCook = URLorigin + "/api/";
+  UrlC = URLorigin + "/api/carts",
+  UrlCook = URLorigin + "/api/";
 let opc = "static";
 let options, dataPagination, querySelect, btnsDelete, btnAdd;
 let storeProducts = [],
@@ -197,7 +198,7 @@ async function selectDelete() {
           }).then(async (result) => {
             if (result.isConfirmed) {
               await updateCarts(selectBtn.id);
-              await deleteData(selectBtn.id)
+              deleteData(selectBtn.id)
                 .then(async (data) => {
                   if (data.status === 200) {
                     const confirm = RouteIndex === "realTP" ? true : false;
@@ -307,7 +308,7 @@ async function filters() {
   selectDelete();
 }
 
-function saveUpdate(data) {
+function saveUpdate(product) {
   Swal.fire({
     title: "ARE YOU SURE TO MODIFY THE PRODUCT?",
     showDenyButton: true,
@@ -316,18 +317,28 @@ function saveUpdate(data) {
     denyButtonText: "NOT",
   }).then(async (result) => {
     if (result.isConfirmed) {
-      Swal.fire({
-        position: "center",
-        text: "Updated Product: " + data.tittle,
-        icon: "success",
-        title: "Product Update Successfully!",
-        showConfirmButton: false,
-        allowOutsideClick: false,
-      });
-      socket.emit("updateproduct", "A product has been updated");
-      setTimeout(() => {
-        window.location.href = "../realtimeproducts";
-      }, 1000);
+      const idProduct = sessionStorage.getItem("productUpdate");
+      updateData(idProduct, product)
+        .then((data) => {
+          if (data.status === 200) {
+            Swal.fire({
+              position: "center",
+              text: "Updated Product: " + product.tittle,
+              icon: "success",
+              title: "Product Update Successfully!",
+              showConfirmButton: false,
+              allowOutsideClick: false,
+            });
+            socket.emit("updateproduct", "A product has been updated");
+            setTimeout(() => {
+              window.location.href = "../realtimeproducts";
+            }, 1000);
+          } else if (data.status === 401 || 403 || 404) {
+            console.warn("Admin authorization expired or invalid");
+            Swal.fire(data.sessionData.error, "", "error");
+          }
+        })
+        .catch((error) => console.log("Error:" + error));
     } else if (result.isDenied) {
       Swal.fire("ACCIÓN CANCELADA", "", "info");
       return;
@@ -346,7 +357,7 @@ async function validateStatus(idExo) {
 }
 
 async function validateProduct(product) {
-  const codeProduct = await getData({ code: product.code });
+  const codeProduct = await getDataUnique({ code: product.code });
   const inputError = [];
   let result = "Success";
   if (inputStock.value < 0) {
@@ -366,7 +377,7 @@ async function validateProduct(product) {
     inputError.unshift("The entered price cannot be negative");
     result = "Error";
   }
-  if (codeProduct.length == 0) {
+  if (!codeProduct) {
     if (product.code < 0) {
       inputCode.value = "";
       inputCode.focus();
@@ -374,7 +385,14 @@ async function validateProduct(product) {
       result = "Error";
     }
   } else {
-    if (RouteIndex === "realTP") {
+    if (RouteIndex === "realTP/") {
+      if (product.code != storeProducts[0].code) {
+        inputCode.value = storeProducts[0].code;
+        inputCode.focus();
+        inputError.unshift("The code entered already exists");
+        result = "Error";
+      }
+    } else {
       inputCode.value = "";
       inputCode.focus();
       inputError.unshift("The code entered already exists");
@@ -460,6 +478,22 @@ async function getData(params) {
     dataPagination = data;
     const newData = data.payload;
     return newData;
+  } catch {
+    console.log(Error);
+  }
+}
+
+async function getDataUnique(query) {
+  try {
+    const queryParam = new URLSearchParams(query).toString();
+    let response = await fetch(`${UrlP1}?${queryParam}`, {
+      method: "GET",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": true,
+      mode: "cors",
+    });
+    const data = await response.json();
+    return data;
   } catch {
     console.log(Error);
   }
@@ -659,7 +693,7 @@ socket.on("updatingProduct", async (updatingMsj) => {
     validateProducts.classList.add("hidden");
     let productUpdate = await getDatabyID(storeProducts[0]._id);
     storeProducts = productUpdate;
-    selectAction();
+    // selectAction();
   } else {
     storeProducts = await getData({});
     filters();
@@ -796,18 +830,9 @@ form.addEventListener("submit", async (e) => {
       [result, inputError] = response;
       if (result == "Success") {
         if (RouteIndex === "realTP/") {
-          await updateData(storeProducts[0]._id, product)
-            .then((data) => {
-              if (data.status === 200) {
-                saveUpdate(data.sessionData);
-              } else if (data.status === 401 || 403 || 404) {
-                console.warn("Admin authorization expired or invalid");
-                Swal.fire(data.sessionData.error, "", "error");
-              }
-            })
-            .catch((error) => console.log("Error:" + error));
+          saveUpdate(product);
         } else if (RouteIndex === "realTP") {
-          await postData(product)
+          postData(product)
             .then(async (data) => {
               if (data.status === 200) {
                 storeProducts = await getData();

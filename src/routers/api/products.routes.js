@@ -1,5 +1,6 @@
 import AppRouter from "../router.js";
 import middlewareGetProducts from "../../middlewares/getProductsMiddleware.js";
+import UniqueGetProduct from "../../middlewares/getUniqueProduct.js";
 import productController from "../../controllers/productController.js";
 
 export default class ProductsRouter extends AppRouter {
@@ -9,6 +10,12 @@ export default class ProductsRouter extends AppRouter {
   }
   init() {
     /*****************************************************************GET****************************************************************/
+    this.getData(
+      "/productOne",
+      ["PUBLIC"],
+      UniqueGetProduct,
+      productController.getProducts
+    );
     this.getData(
       "/products",
       ["PUBLIC"],

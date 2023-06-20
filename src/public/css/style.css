@@ -1780,7 +1780,7 @@
   justify-content: center;
 }
 
-#return a {
+#return a,#current a {
   font-size: 1.5rem;
   border: solid black 2px;
   color: #f2f600;
@@ -1792,18 +1792,33 @@
   text-align: center;
 }
 
-#return a:hover {
+#return a:hover,#current a:hover {
   color: #fbfe56;
   background-color: rgb(75, 2, 220);
   box-shadow: #9966cc 0px 0px 20px 0px;
 }
 
-#return i {
+#return i,#current i{
   position: relative;
   margin: 7px;
   left: 0;
   font-size: 1.625rem;
   position: relative;
+}
+
+#current{
+  position: fixed;
+  top: 0;
+  right: 0;
+  background-color: rgb(61, 2, 179);
+  box-shadow: #9966cc 0px 0px 20px 0px;
+  transition: all 900ms ease-in-out;
+  z-index: 100;
+  border-radius: 10px;
+  margin: 5px;
+  width: 6vh;
+  display: flex;
+  align-items: center;
 }
 
 /*CHAT LOGIN BLOCK*/

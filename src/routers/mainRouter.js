@@ -15,6 +15,8 @@ export default class ViewsRouter extends AppRouter {
   init() {
     this.getRoute("/", ["PUBLIC"], publicController.login);
 
+    this.getRoute("/current", ["PUBLIC"],publicController.current)
+
     this.getRoute("/login", ["PUBLIC"], publicController.login);
 
     this.getRoute("/signup", ["PUBLIC"], publicController.signup);

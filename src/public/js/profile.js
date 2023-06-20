@@ -100,7 +100,7 @@ btnLogout.addEventListener("click", async () => {
         }, 1500),
           Swal.fire({
             position: "center",
-            icon: "info",
+            icon: "success",
             title: msj,
             text: "Redirigiendo al login",
             showConfirmButton: false,

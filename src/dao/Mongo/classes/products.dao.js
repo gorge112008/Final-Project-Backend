@@ -10,6 +10,16 @@ export default class ProductDao {
       throw err;
     }
   }
+
+  async getProductUnique(query) {
+    try {
+      const product = await productsModel.findOne(query);
+      return product;
+    } catch (err) {
+      throw err;
+    }
+  }
+
   async getProductId(id) {
     try {
       const newProduct = [];

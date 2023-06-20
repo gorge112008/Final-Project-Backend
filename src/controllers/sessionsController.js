@@ -1,4 +1,5 @@
 import { generateToken } from "../utils.js";
+import SessionDto from "../dao/DTOs/sessionDto.js";
 
 const sessionController = {
   getSession: async (req, res) => {
@@ -21,7 +22,8 @@ const sessionController = {
   },
   getCurrentSession: async (req, res) => {
     try {
-      const session = req.user;
+      const { first_name, last_name, age, role } = req.user.user;
+      const session = new SessionDto({ first_name, last_name, age, role });
       res.sendSuccess(200, session);
     } catch (error) {
       res.sendServerError({ error: "Error reading session" + error });
@@ -57,7 +59,7 @@ const sessionController = {
         if (err) {
           res.sendServerError({ error: "Error destroying session" + err });
         } else {
-            const msj = `YOU HAVE ENDED YOUR SESSION SUCCESSFULLY`;
+          const msj = `YOU HAVE ENDED YOUR SESSION SUCCESSFULLY`;
           res.sendSuccess(200, msj);
         }
       });
@@ -80,7 +82,7 @@ const sessionController = {
         signed: true,
       });
       res.cookie("login", login);
-          res.redirect("/github");
+      res.redirect("/github");
     } catch (error) {
       res.sendServerError({ error: "Not exist any session: " + error });
     }
@@ -89,7 +91,7 @@ const sessionController = {
     try {
       const session = req.user;
       const role = session.role;
-      const userName =session.first_name;
+      const userName = session.first_name;
       const msj = `WELCOME ${userName.toUpperCase()}`;
       req.session.counter = 1;
       const token = generateToken(session);

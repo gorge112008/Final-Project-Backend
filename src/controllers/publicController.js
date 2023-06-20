@@ -4,6 +4,9 @@ const publicController = {
   index: (req, res) => {
     res.render("public/index", { isLogin: true, style: "/css/index.css" });
   },
+  current: (req, res)=>{
+    res.render("public/current", { isLogin: true, style: "/css/current.css"})
+  },
   login: (req, res) => {
     res.render("public/login", { isLogin: true, style: "/css/login.css" });
   },

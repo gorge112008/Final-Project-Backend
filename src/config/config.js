@@ -24,10 +24,3 @@ export default {
     CONNECTION_URL: `mongodb+srv://${USER_MONGO}:${PASS_MONGO}@codercluster.xq93twh.mongodb.net/${DB_MONGO}?retryWrites=true&w=majority`,
   },
 };
-
-//MODELO DE PERSISTENCIA EN MONGO
-export const PERSISTENCE = "MONGO";
-
-/*PRUEBA DE MODELO DE PERSISTENCIA EN MEMORIA
-SOLO GET PRODUCTS 
-export const PERSISTENCE = "MEMORY";*/
