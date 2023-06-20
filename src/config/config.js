@@ -10,7 +10,7 @@ program.parse();
 const enviroment = program.opts().mode.toUpperCase();
 
 dotenv.config({
-  path: enviroment === "PRODUCTION" ? ".env.prod" : ".env.dev",
+  path: enviroment === "PRODUCTION" ? ".env" : ".env.dev",
 });
 
 const { USER_MONGO, PASS_MONGO, DB_MONGO, PORT } = process.env;
