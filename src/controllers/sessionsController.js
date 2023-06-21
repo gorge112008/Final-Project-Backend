@@ -29,27 +29,6 @@ const sessionController = {
       res.sendServerError({ error: "Error reading session" + error });
     }
   },
-  getFailLogin: async (req, res) => {
-    try {
-      res.sendUserError(401, { error: `Invalid email or password` });
-    } catch (error) {
-      res.sendServerError({ error: "Error reading session" + error });
-    }
-  },
-  getFailRegister: async (req, res) => {
-    try {
-      res.sendUserError(401, { error: `Email already registered` });
-    } catch (error) {
-      res.sendServerError({ error: "Error reading session" + error });
-    }
-  },
-  getFailForgot: async (req, res) => {
-    try {
-      res.sendUserError(401, { error: `Invalid email` });
-    } catch (error) {
-      res.sendServerError({ error: "Error reading session" + error });
-    }
-  },
   getLogout: async (req, res) => {
     try {
       res.clearCookie("connect.sid");

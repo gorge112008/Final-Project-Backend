@@ -15,11 +15,11 @@ const form = document.querySelector("form"),
   btnViewPsw = document.getElementById("btnTogglePsw"),
   btnViewPswRep = document.getElementById("btnTogglePswRep");
 
-const psw1= document.querySelector(".forgot__psw"),
-  psw2= document.querySelector(".forgot__psw2");
+const psw1 = document.querySelector(".forgot__psw"),
+  psw2 = document.querySelector(".forgot__psw2");
 
-  psw1.classList.remove("hidden");//UNLOCK PASSWORD UNTIL IMPLEMENT VALIDATION
-  psw2.classList.remove("hidden");//UNLOCK PASSWORD2 UNTIL IMPLEMENT VALIDATION
+psw1.classList.remove("hidden"); //UNLOCK PASSWORD UNTIL IMPLEMENT VALIDATION
+psw2.classList.remove("hidden"); //UNLOCK PASSWORD2 UNTIL IMPLEMENT VALIDATION
 
 /*****************************************************************CLASES*************************************************************/
 class RecoveryUser {
@@ -30,6 +30,59 @@ class RecoveryUser {
 }
 
 /*********************************************************FUNCIONES*************************************************************/
+async function VerificateSession() {
+  try {
+    let response = await fetch(Urlsession, {
+      method: "GET",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
+      mode: "cors",
+    });
+    const { error, msj, session, role } = await response.json();
+    if (response.status === 200) {
+      if (role === "admin") {
+        sessionStorage.setItem(
+          "userSession",
+          JSON.stringify({ msj: msj, role: role })
+        );
+        setTimeout(() => {
+          window.location.href = "../products";
+        }, 2000),
+          Swal.fire({
+            position: "center",
+            icon: "info",
+            title: "ADMIN SESSION ACTIVE",
+            text: session.email,
+            showConfirmButton: false,
+            allowOutsideClick: false,
+          });
+      } else if (role === "user") {
+        sessionStorage.setItem(
+          "userSession",
+          JSON.stringify({ msj: msj, role: role })
+        );
+        setTimeout(() => {
+          window.location.href = "../products";
+        }, 2000),
+          Swal.fire({
+            position: "center",
+            icon: "info",
+            title: "USER SESSION ACTIVE",
+            text: session.email,
+            showConfirmButton: false,
+            allowOutsideClick: false,
+          });
+      }
+    } else if (response.status === 401||403) {
+      console.log(error);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 async function sendRecovery(data) {
   try {
     let response = await fetch(UrlForgot, {
@@ -93,34 +146,25 @@ form.addEventListener("submit", async (e) => {
     const recoveryValues = new RecoveryUser();
     const { status, recoveryData } = await sendRecovery(recoveryValues);
     if (status === 200) {
-      Swal.fire({
-        position: "center",
-        title: recoveryData.success,
-        text: "Updated Password",
-        icon: "success",
-        showConfirmButton: false,
-        allowOutsideClick: false,
-      });
       setDataCookie({ user: recoveryValues.email, timer: 300000 }); //Cookie de sesion nueva registrada, duración 5 min.
       const { sessionData } = await startSession(recoveryValues);
       const userSession = sessionData.session;
-      userSession.admin ? (role = "admin") : (role = "user");
       sessionStorage.setItem(
         "userSession",
-        JSON.stringify({ msj: sessionData.success, role: role })
+        JSON.stringify({ msj: sessionData.success, role: userSession.role })
       );
       setTimeout(() => {
         window.location.href = "../products";
-      }, 2000),
+      },3000),
         Swal.fire({
           position: "center",
           icon: "success",
-          title: "Logging in...",
-          text: recoveryData.success,
+          title: "Recovery Password Success!!!" ,
+          text: "Logging in...",
           showConfirmButton: false,
           allowOutsideClick: false,
         });
-    } else if (status === 404||401) {
+    } else if (status === 404 || 401) {
       Swal.fire({
         title: recoveryData.error,
         text: "Your credentials entered are incorrect",
@@ -171,3 +215,5 @@ btnViewPswRep.addEventListener("click", function () {
     btnViewPswRep.innerHTML = `<i class="fa-regular fa-eye-slash"></i>`;
   }
 });
+
+VerificateSession();

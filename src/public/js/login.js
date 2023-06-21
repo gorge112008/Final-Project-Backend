@@ -3,7 +3,7 @@
 /*********************************************************CONSTANTES/VARIABLES*************************************************************/
 let URLorigin = window.location.origin,
   UrlCook = URLorigin + "/api/",
-  Urlsession = URLorigin + "/api/sessions/",
+  Urlsession = URLorigin + "/api/sessions/session",
   UrlLogin = URLorigin + "/api/sessions/login";
 
 const form = document.querySelector("form"),
@@ -26,7 +26,7 @@ class LoginUser {
 /*********************************************************FUNCIONES*************************************************************/
 async function VerificateSession() {
   try {
-    let response = await fetch(Urlsession + "session", {
+    let response = await fetch(Urlsession, {
       method: "GET",
       headers: {
         "Access-Control-Allow-Origin": "*",

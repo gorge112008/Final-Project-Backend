@@ -62,6 +62,10 @@ export const passportInit = (strategy) => {
   return async (req, res, next) => {
     passport.authenticate(strategy, function (err, user, info) {
       if (err) return next(err);
+      if (!user)
+        return res.status(401).json({
+          error: info.message,
+        });
       req.user = user;
       next();
     })(req, res, next);

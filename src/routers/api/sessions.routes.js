@@ -22,24 +22,6 @@ export default class SessionsRouter extends AppRouter {
       sessionController.getCurrentSession
     );
 
-    this.getData(
-      "/sessions/faillogin",
-      ["PUBLIC"],
-      sessionController.getFailLogin
-    );
-
-    this.getData(
-      "/sessions/failregister",
-      ["PUBLIC"],
-      sessionController.getFailRegister
-    );
-
-    this.getData(
-      "/sessions/failforgot",
-      ["PUBLIC"],
-      sessionController.getFailForgot
-    );
-
     this.getData("/sessions/logout", ["PUBLIC"], sessionController.getLogout);
 
     this.getData(
@@ -53,9 +35,7 @@ export default class SessionsRouter extends AppRouter {
     this.getData(
       "/sessions/githubcallback",
       ["PUBLIC"],
-      passportInit("github", {
-        failureRedirect: "/login",
-      }),
+      passportInit("github"),
       auth,
       sessionController.getGitHubCallBack
     );
@@ -63,28 +43,20 @@ export default class SessionsRouter extends AppRouter {
     this.postData(
       "/sessions/login",
       ["PUBLIC"],
-      passportInit("login", {
-        failureRedirect: "/api/sessions/faillogin",
-      }),
+      passportInit("login"),
       auth,
       sessionController.postLogin
     );
     this.postData(
       "/sessions/signup",
       ["PUBLIC"],
-      passportInit("signup", {
-        failureRedirect: "/api/sessions/failregister",
-      }),
-      auth,
+      passportInit("signup"),
       sessionController.postSignup
     );
     this.postData(
       "/sessions/forgot",
       ["PUBLIC"],
-      passportInit("forgot", {
-        failureRedirect: "/api/sessions/failforgot",
-      }),
-      auth,
+      passportInit("forgot"),
       sessionController.postForgot
     );
     this.getData("*", sessionController.getNotFound);

@@ -49,6 +49,59 @@ class LoginUser {
 }
 
 /*****************************************************************FUNCIONES*************************************************************/
+async function VerificateSession() {
+  try {
+    let response = await fetch(Urlsession, {
+      method: "GET",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
+      mode: "cors",
+    });
+    const { error, msj, session, role } = await response.json();
+    if (response.status === 200) {
+      if (role === "admin") {
+        sessionStorage.setItem(
+          "userSession",
+          JSON.stringify({ msj: msj, role: role })
+        );
+        setTimeout(() => {
+          window.location.href = "../products";
+        }, 2000),
+          Swal.fire({
+            position: "center",
+            icon: "info",
+            title: "ADMIN SESSION ACTIVE",
+            text: session.email,
+            showConfirmButton: false,
+            allowOutsideClick: false,
+          });
+      } else if (role === "user") {
+        sessionStorage.setItem(
+          "userSession",
+          JSON.stringify({ msj: msj, role: role })
+        );
+        setTimeout(() => {
+          window.location.href = "../products";
+        }, 2000),
+          Swal.fire({
+            position: "center",
+            icon: "info",
+            title: "USER SESSION ACTIVE",
+            text: session.email,
+            showConfirmButton: false,
+            allowOutsideClick: false,
+          });
+      }
+    } else if (response.status === 401||403) {
+      console.log(error);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 async function startSession(user) {
   try {
     let response = await fetch(UrlLogin, {
@@ -146,10 +199,9 @@ form.addEventListener("submit", async (e) => {
     const userLogin = new LoginUser();
     const { sessionData } = await startSession(userLogin);
     const userSession = sessionData.session;
-    userSession.admin ? (role = "admin") : (role = "user");
     sessionStorage.setItem(
       "userSession",
-      JSON.stringify({ msj: sessionData.success, role: role })
+      JSON.stringify({ msj: sessionData.success, role: userSession.role })
     );
     setTimeout(() => {
       window.location.href = "../products";
@@ -190,5 +242,5 @@ btnViewPsw.addEventListener("click", function () {
 });
 
 age();
-
+VerificateSession();
 
