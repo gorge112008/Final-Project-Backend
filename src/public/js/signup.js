@@ -158,11 +158,14 @@ async function postUser(user) {
   try {
     let response = await fetch(Urlsignup, {
       method: "POST",
+      credentials: "same-origin",
       headers: {
         "Content-Type": "application/json",
       },
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Credentials": true,
+      redirect: "follow",
+      referrerPolicy: "no-referrer",
       mode: "cors",
       body: JSON.stringify(user),
     });

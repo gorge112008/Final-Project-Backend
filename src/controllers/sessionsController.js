@@ -1,5 +1,6 @@
 import { generateToken } from "../utils.js";
 import SessionDto from "../dao/DTOs/sessionDto.js";
+import {senderMail} from "../helpers/sender.js";
 
 const sessionController = {
   getSession: async (req, res) => {
@@ -91,6 +92,10 @@ const sessionController = {
   postSignup: async (req, res) => {
     try {
       if (req.user && !req.user.error) {
+        senderMail
+          .Sender(req.user)
+          .then((dat) => console.log(dat))
+          .catch((err) => console.log(err));
         const msj = {
           success: `Email ${req.user.email} successfully registered`,
         };

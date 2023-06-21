@@ -3,8 +3,7 @@ const auth = async (req, res, next) => {
     if (req.user && !req.user.error) {
       if (
         req.user.email === "adminCoder@coder.com" ||
-        req.user.email === "adminJorge@coder.com" ||
-        req.user.email === "adminAlhena@coder.com"
+        req.user.email === "adminJorge@coder.com" 
       ) {
         const { role, ...resUser } = req.user._doc;
         const newUser = { role: "admin", ...resUser };

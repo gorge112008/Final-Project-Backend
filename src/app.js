@@ -1,42 +1,32 @@
 import express from "express";
-import session from "express-session";
-import cors from "cors";
+import config from "./config/config.js";
 import cookieParser from "cookie-parser";
-import { engine } from "express-handlebars";
+import cors from "cors";
+import logger from "morgan";
+import path from "path";
+import Handlebars from "handlebars";
 import MongoSingleton from "./utils/mongoSingletonClass.js";
 import MongoStore from "connect-mongo";
-import { __dirname } from "./utils.js";
-import ProductsRouter from "./routers/api/products.routes.js";
-import CartsRouter from "./routers/api/carts.routes.js";
-import ChatRouter from "./routers/api/chat.routes.js";
-import UsersRouter from "./routers/api/users.routes.js";
-import ViewsRouter from "./routers/mainRouter.js";
-import SessionsRouter from "./routers/api/sessions.routes.js";
-import CookiesRouter from "./routers/api/cookies.routes.js";
-import Handlebars from "handlebars";
-import { allowInsecurePrototypeAccess } from "@handlebars/allow-prototype-access";
 import passport from "passport";
+import session from "express-session";
+import { engine } from "express-handlebars";
+import { __dirname } from "./utils.js";
+import { routersManager } from "./routers.js";
 import { initializePassport } from "./config/passport.config.js";
-import config from "./config/config.js";
+import { allowInsecurePrototypeAccess } from "@handlebars/allow-prototype-access";
 
 const { DB_USER, DB_PASS, CONNECTION_URL } = config.mongo;
 
 const app = express(); //Crear una aplicacion express
 
-const usersRouter = new UsersRouter(),
-  sessionsRouter = new SessionsRouter(),
-  productsRouter = new ProductsRouter(),
-  cartsRouter = new CartsRouter(),
-  chatRouter = new ChatRouter(),
-  cookiesRouter = new CookiesRouter(),
-  viewsRouter = new ViewsRouter();
-
-app.use(
+/*app.use(
   cors({
     origin: ["http://127.0.0.1:5500"],
   })
-);
+);*/
+app.use(cors());
 app.use(cookieParser("S3cr3tC0d3r"));
+app.use(logger("dev"));
 app.use(
   session({
     secret: "S3cr3tC0d3r",
@@ -56,15 +46,15 @@ app.use(express.json()); //Configurar el servidor para que pueda entender los fo
 app.use(express.urlencoded({ extended: true })); //Configurar el servidor para que pueda entender los formatos URL Encoded
 app.use(passport.initialize());
 app.use(passport.session());
-app.use("/", viewsRouter.Routers());
+app.use("/", routersManager.viewsRouter);
 app.use(
   "/api",
-  productsRouter.Routers(),
-  cartsRouter.Routers(),
-  chatRouter.Routers(),
-  usersRouter.Routers(),
-  cookiesRouter.Routers(),
-  sessionsRouter.Routers()
+  routersManager.productsRouter,
+  routersManager.cartsRouter,
+  routersManager.chatRouter,
+  routersManager.usersRouter,
+  routersManager.cookiesRouter,
+  routersManager.sessionsRouter
 );
 /*********************************************************************** */
 //    RUTA CUSTOM PARA REVISAR TOKEN JWT DE USUARIO ACTUAL.
@@ -79,8 +69,8 @@ app.engine(
   })
 );
 app.set("view engine", "handlebars");
-app.set("views", __dirname + "/views");
-app.use(express.static(__dirname + "/public")); //Configurar el servidor para que pueda entender la ruta de los archivos estaticos
+app.set("views", path.join(__dirname, "/views"));
+app.use(express.static(path.join(__dirname,"/public"))); //Configurar el servidor para que pueda entender la ruta de los archivos estaticos
 
 const environment = async () => {
   await MongoSingleton.getInstance(CONNECTION_URL);
