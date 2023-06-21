@@ -349,7 +349,11 @@ export const emailSend = {
         </td>
       </tr>
     </table>
+    <div align="center">
+      <img src="cid:welcome" />
+    </div>
   </body>
-</html>`;
+</html>
+`;
   },
 };

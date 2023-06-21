@@ -134,7 +134,7 @@
   font-size: 1rem;
   font-family: "Times New Roman", Times, serif;
   height: 5vh;
-  width: 95%;
+  width: 85%;
   border: none;
   border-bottom: solid rgb(0, 0, 0) 3px;
 }
@@ -377,5 +377,9 @@
   .login__form__profile {
     height: 15vh;
     width: 15vh;
+  }
+
+  .login--input{
+    width: 13vw;
   }
 }
