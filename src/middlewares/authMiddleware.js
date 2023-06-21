@@ -8,7 +8,8 @@ const auth = async (req, res, next) => {
       ) {
         const { role, ...resUser } = req.user._doc;
         const newUser = { role: "admin", ...resUser };
-        req.session.admin = req.session.admin || newUser;
+        req.session.admin=true;
+        req.session.user = req.session.user || newUser;
         req.user=newUser;
       } else {
         req.session.user = req.session.user || req.user;

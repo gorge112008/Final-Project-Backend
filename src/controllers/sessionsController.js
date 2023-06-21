@@ -4,8 +4,8 @@ import SessionDto from "../dao/DTOs/sessionDto.js";
 const sessionController = {
   getSession: async (req, res) => {
     try {
-      if (req.user && req.session.counter) {
-        const session = req.user.user;
+      if (req.session && req.session.counter) {
+        const session = req.session.user;
         const role = session.role;
         const userName = session.first_name;
         req.session.counter++;

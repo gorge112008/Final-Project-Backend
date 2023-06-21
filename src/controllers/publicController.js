@@ -4,8 +4,8 @@ const publicController = {
   index: (req, res) => {
     res.render("public/index", { isLogin: true, style: "/css/index.css" });
   },
-  current: (req, res)=>{
-    res.render("public/current", { isLogin: true, style: "/css/current.css"})
+  current: (req, res) => {
+    res.render("public/current", { isLogin: true, style: "/css/current.css" });
   },
   login: (req, res) => {
     res.render("public/login", { isLogin: true, style: "/css/login.css" });
@@ -22,11 +22,10 @@ const publicController = {
     res.render("public/github", { isLogin: true, msj: msj, role: role });
   },
   profile: (req, res) => {
-    const { role, email } = res.locals.resUser;
-    const resSession = res.locals.resSession;
+    const resSession = req.session.user;
     res.render("public/profile", {
-      role: role,
-      user: email,
+      role: resSession.role,
+      user: resSession.email,
       body: resSession,
       style: "/css/profile.css",
     });

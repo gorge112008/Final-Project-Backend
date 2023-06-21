@@ -81,7 +81,6 @@ export const initializePassport = () => {
                     };
                     return done(null, false, err);
                   } else {
-                    console.log("mail no");
                     user._doc && delete user._doc.password; //IMPORTANT: delete password from user
                     return done(null, user);
                   }

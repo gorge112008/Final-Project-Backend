@@ -46,34 +46,40 @@ export const passportCall = (strategy) => {
   return async (req, res, next) => {
     passport.authenticate(strategy, function (err, user, info) {
       if (err) return next(err);
-      if (!user) {
-        if (req.path === "/sessions/current") return res.status(401).json({
-          error: info.message
-            ? info.message + ", please login again"
-            : "Unauthorized, please login again",
-        });
-        if (req.path === "/sessions/session") {
-          if (req.session.counter) {
-            const session = req.session.admin
-              ? req.session.admin
-              : req.session.user;
-            const msj = "Logout and Login Again Please...";
-            return res.status(200).json({
-              success: msj,
-              session: session,
-              role: session.role,
-            });
-          } else {
-            return res.status(401).json({
-              error: info.message
-                ? info.message + ", please login again"
-                : "Unauthorized, please login again",
-            });
-          }
-        } else {
-          return res.status(401).render("unauthorized", { isLogin: true });
-        }
+      if (!req.session.counter) {
+        return res.status(401).render("redirection", { isLogin: true });
       }
+      if (!user) {
+        return res.status(401).render("unauthorized", { isLogin: true });
+      }
+      req.user = user;
+      next();
+    })(req, res, next);
+  };
+};
+
+export const passportInit = (strategy) => {
+  return async (req, res, next) => {
+    passport.authenticate(strategy, function (err, user, info) {
+      if (err) return next(err);
+      req.user = user;
+      next();
+    })(req, res, next);
+  };
+};
+
+export const passportCurrent = (strategy) => {
+  return async (req, res, next) => {
+    passport.authenticate(strategy, function (err, user, info) {
+      if (err) return next(err);
+      if (!req.session.counter)
+        return res.status(401).json({
+          error: "No sesion, please login first",
+        });
+      if (!user)
+        return res.status(401).json({
+          error: info.message + ",please login again",
+        });
       req.user = user;
       next();
     })(req, res, next);

@@ -1,6 +1,6 @@
 import AppRouter from "../router.js";
 import auth from "../../middlewares/authMiddleware.js";
-import { passportCall } from "../../utils.js";
+import { passportCall, passportCurrent, passportInit } from "../../utils.js";
 import sessionController from "../../controllers/sessionsController.js";
 
 export default class SessionsRouter extends AppRouter {
@@ -12,14 +12,13 @@ export default class SessionsRouter extends AppRouter {
     this.getSession(
       "/sessions/session",
       ["PUBLIC"],
-      passportCall("jwt"),
       sessionController.getSession
     );
 
     this.getSession(
       "/sessions/current",
       ["PUBLIC"],
-      passportCall("jwt", { session: false }),
+      passportCurrent("jwt"),
       sessionController.getCurrentSession
     );
 
@@ -46,7 +45,7 @@ export default class SessionsRouter extends AppRouter {
     this.getData(
       "/sessions/github",
       ["PUBLIC"],
-      passportCall("github", {
+      passportInit("github", {
         scope: ["user:email"],
       }),
       sessionController.getGitHubSession
@@ -54,7 +53,7 @@ export default class SessionsRouter extends AppRouter {
     this.getData(
       "/sessions/githubcallback",
       ["PUBLIC"],
-      passportCall("github", {
+      passportInit("github", {
         failureRedirect: "/login",
       }),
       auth,
@@ -64,7 +63,7 @@ export default class SessionsRouter extends AppRouter {
     this.postData(
       "/sessions/login",
       ["PUBLIC"],
-      passportCall("login", {
+      passportInit("login", {
         failureRedirect: "/api/sessions/faillogin",
       }),
       auth,
@@ -73,17 +72,19 @@ export default class SessionsRouter extends AppRouter {
     this.postData(
       "/sessions/signup",
       ["PUBLIC"],
-      passportCall("signup", {
+      passportInit("signup", {
         failureRedirect: "/api/sessions/failregister",
       }),
+      auth,
       sessionController.postSignup
     );
     this.postData(
       "/sessions/forgot",
       ["PUBLIC"],
-      passportCall("forgot", {
+      passportInit("forgot", {
         failureRedirect: "/api/sessions/failforgot",
       }),
+      auth,
       sessionController.postForgot
     );
     this.getData("*", sessionController.getNotFound);
