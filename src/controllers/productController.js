@@ -1,8 +1,8 @@
 //import { ProductDAO } from "../dao/Mongo/classes/DBmanager.js";
 import { ProductDAO } from "../dao/index.js";
-import ProductRepository from "../repository/product.repository.js";
+import DaoRepository from "../repository/DaoRepository.js";
 
-const repoProduct = new ProductRepository(ProductDAO);
+const repoProduct = new DaoRepository(ProductDAO);
 
 const productController = {
   getProducts: (req, res) => {
@@ -16,7 +16,7 @@ const productController = {
   getProductId: async (req, res) => {
     try {
       const pid = req.params.pid;
-      let product = await repoProduct.getProductId(pid);
+      let product = await repoProduct.getDataId(pid);
       res.sendSuccess(200, product);
     } catch (err) {
       res.sendServerError({ error: err });
@@ -25,7 +25,7 @@ const productController = {
   addProduct: async (req, res) => {
     try {
       const newProduct = req.body;
-      let response = await repoProduct.addProduct(newProduct);
+      let response = await repoProduct.addData(newProduct);
       res.sendSuccess(200, response);
     } catch (err) {
       res.sendServerError({ error: err });
@@ -35,7 +35,7 @@ const productController = {
     try {
       const pid = req.params.pid;
       const body = req.body;
-      let response = await repoProduct.updateProduct(pid, body);
+      let response = await repoProduct.updateData(pid, body);
       res.sendSuccess(200, response);
     } catch (err) {
       res.sendServerError({ error: err });
@@ -44,7 +44,7 @@ const productController = {
   deleteProduct: async (req, res) => {
     try {
       const pid = req.params.pid;
-      await repoProduct.deleteProduct(pid);
+      await repoProduct.deleteData(pid);
       res.sendSuccess(200, pid);
     } catch (err) {
       res.sendServerError({ error: err });

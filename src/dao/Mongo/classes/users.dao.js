@@ -1,7 +1,7 @@
 import { userModel } from "../models/users.model.js";
 
 export default class UserDao {
-  async getUsers() {
+  async getData() {
     try {
       const Users = await userModel.find();
       return Users;
@@ -10,7 +10,7 @@ export default class UserDao {
     }
   }
 
-  async getUserUnique(query) {
+  async getDataUnique(query) {
     try {
       const User = await userModel.findOne(query);
       return User;
@@ -19,7 +19,7 @@ export default class UserDao {
     }
   }
 
-  async getUserId(id) {
+  async getDataId(id) {
     try {
       const User = await userModel.findOne({ _id: id }).populate("cart");
       return User;
@@ -27,7 +27,7 @@ export default class UserDao {
       throw err;
     }
   }
-  async getUserbyEmail(email) {
+  async getDatabyEmail(email) {
     try {
       const User = await userModel.findOne({ email: email });
       return User;
@@ -35,7 +35,7 @@ export default class UserDao {
       throw err;
     }
   }
-  async addUser(newUser) {
+  async addData(newUser) {
     try {
       const response = await userModel.create(newUser);
       return response;
@@ -43,7 +43,7 @@ export default class UserDao {
       throw err;
     }
   }
-  async updateUser(email, body) {
+  async updateData(email, body) {
     try {
       const User = await userModel.findOneAndUpdate({ email: email }, body, {
         new: true,
@@ -55,7 +55,7 @@ export default class UserDao {
     }
   }
 
-  async deleteUser(id) {
+  async deleteData(id) {
     try {
       await userModel.findByIdAndDelete(id);
       return;

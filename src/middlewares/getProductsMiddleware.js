@@ -1,5 +1,8 @@
 //import { ProductDAO } from "../dao/Mongo/classes/DBmanager.js";
 import { ProductDAO } from "../dao/index.js";
+import DaoRepository from "../repository/DaoRepository.js";
+
+const repoProduct = new DaoRepository(ProductDAO);
 
 class ListProducts {
   constructor(
@@ -61,7 +64,7 @@ const middlewareGetProducts = async (req, res, next) => {
         listQuery += `&${key}=${value}`;
       }
     }
-    const products = await ProductDAO.getProducts({
+    const products = await repoProduct.getData({
       limit,
       page,
       sort,

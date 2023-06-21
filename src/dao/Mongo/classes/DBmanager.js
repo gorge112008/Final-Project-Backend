@@ -6,7 +6,7 @@ import { userModel } from "../models/users.model.js";
 /*********************************************************PRODUCTS*************************************************************/
 
 class ProductDao {
-  async getProducts({ limit, page, sort, query }) {
+  async getData({ limit, page, sort, query }) {
     try {
       let products;
       products = await productsModel.paginate(query, { limit, page, sort });
@@ -16,7 +16,7 @@ class ProductDao {
     }
   }
 
-  async getProductId(id) {
+  async getDataId(id) {
     try {
       const newProduct = [];
       const product = await productsModel.findOne({ _id: id });
@@ -26,7 +26,7 @@ class ProductDao {
       throw err;
     }
   }
-  async addProduct(newProduct) {
+  async addData(newProduct) {
     try {
       const product = await productsModel.create(newProduct);
       return product;
@@ -34,7 +34,7 @@ class ProductDao {
       throw err;
     }
   }
-  async updateProduct(id, body) {
+  async updateData(id, body) {
     try {
       const product = await productsModel.findOneAndUpdate({ _id: id }, body, {
         new: true,
@@ -46,7 +46,7 @@ class ProductDao {
     }
   }
 
-  async deleteProduct(id) {
+  async deleteData(id) {
     try {
       await productsModel.findByIdAndDelete(id);
       return;
@@ -59,7 +59,7 @@ class ProductDao {
 /*********************************************************CARTS*************************************************************/
 
 class CartDao {
-  async getCarts() {
+  async getData() {
     try {
       const carts = await cartsModel.find();
       return carts;
@@ -67,7 +67,7 @@ class CartDao {
       throw err;
     }
   }
-  async getCartId(id) {
+  async getDataId(id) {
     try {
       const cart = await cartsModel
         .find({ _id: id })
@@ -77,7 +77,7 @@ class CartDao {
       throw err;
     }
   }
-  async addCart(newProduct) {
+  async addData(newProduct) {
     try {
       const cart = await cartsModel.create(newProduct);
       return cart;
@@ -85,7 +85,7 @@ class CartDao {
       throw err;
     }
   }
-  async updateCart(id, body) {
+  async updateData(id, body) {
     try {
       const cart = await cartsModel.findOneAndUpdate({ _id: id }, body, {
         new: true,
@@ -97,7 +97,7 @@ class CartDao {
     }
   }
 
-  async deleteCart(id) {
+  async deleteData(id) {
     try {
       await cartsModel.findByIdAndDelete(id);
       return;
@@ -110,7 +110,7 @@ class CartDao {
 /*********************************************************MESSAGES*************************************************************/
 
 class MessageDao {
-  async getMessages() {
+  async getData() {
     try {
       const messages = await messagesModel.find();
       return messages;
@@ -118,7 +118,7 @@ class MessageDao {
       throw err;
     }
   }
-  async getMessageId(id) {
+  async getDataId(id) {
     try {
       const message = await messagesModel.find({ _id: id });
       return message;
@@ -126,7 +126,7 @@ class MessageDao {
       throw err;
     }
   }
-  async addMessage(newMessage) {
+  async addData(newMessage) {
     try {
       const message = await messagesModel.create(newMessage);
       return message;
@@ -134,7 +134,7 @@ class MessageDao {
       throw err;
     }
   }
-  async updateMessage(id, body) {
+  async updateData(id, body) {
     try {
       const message = await messagesModel.findOneAndUpdate({ _id: id }, body, {
         new: true,
@@ -146,7 +146,7 @@ class MessageDao {
     }
   }
 
-  async deleteMessage(id) {
+  async deleteData(id) {
     try {
       await messagesModel.findByIdAndDelete(id);
       return;
@@ -159,7 +159,7 @@ class MessageDao {
 /*********************************************************USERS*************************************************************/
 
 class UserDao {
-  async getUsers() {
+  async getData() {
     try {
       const Users = await userModel.find();
       return Users;
@@ -168,7 +168,7 @@ class UserDao {
     }
   }
 
-  async getUserUnique(query) {
+  async getDataUnique(query) {
     try {
       const User = await userModel.findOne(query);
       return User;
@@ -177,7 +177,7 @@ class UserDao {
     }
   }
 
-  async getUserId(id) {
+  async getDataId(id) {
     try {
       const User = await userModel.findOne({ _id: id }).populate("cart");
       return User;
@@ -185,7 +185,7 @@ class UserDao {
       throw err;
     }
   }
-  async getUserbyEmail(email) {
+  async getDatabyEmail(email) {
     try {
       const User = await userModel.findOne({ email: email });
       return User;
@@ -193,7 +193,7 @@ class UserDao {
       throw err;
     }
   }
-  async addUser(newUser) {
+  async addData(newUser) {
     try {
       const response = await userModel.create(newUser);
       return response;
@@ -201,7 +201,7 @@ class UserDao {
       throw err;
     }
   }
-  async updateUser(email, body) {
+  async updateData(email, body) {
     try {
       const User = await userModel.findOneAndUpdate({ email: email }, body, {
         new: true,
@@ -213,7 +213,7 @@ class UserDao {
     }
   }
 
-  async deleteUser(id) {
+  async deleteData(id) {
     try {
       await userModel.findByIdAndDelete(id);
       return;

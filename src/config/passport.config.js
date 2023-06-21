@@ -5,6 +5,9 @@ import { UserDAO } from "../dao/index.js";
 import { createHash, isValidPassword } from "../utils.js";
 import jwt from "passport-jwt";
 import GitHubStrategy from "passport-github2";
+import DaoRepository from "../repository/DaoRepository.js";
+
+const repoUser = new DaoRepository(UserDAO);
 
 const LocalStrategy = local.Strategy;
 const JWTStrategy = jwt.Strategy;
@@ -18,7 +21,7 @@ export const initializePassport = () => {
       async (req, username, password, done) => {
         const { first_name, last_name, age } = req.body;
         try {
-          const user = await UserDAO.getUserUnique({
+          const user = await repoUser.getDataUnique({
             email: username,
           });
           if (!user) {
@@ -29,7 +32,7 @@ export const initializePassport = () => {
               age: age,
               password: createHash(password),
             };
-            const response = await UserDAO.addUser(newUser);
+            const response = await repoUser.addData(newUser);
             response._doc && delete response._doc.password;
             return done(null, response);
           } else {
@@ -47,7 +50,7 @@ export const initializePassport = () => {
       { passReqToCallback: true, usernameField: "email" },
       async (req, username, password, done) => {
         try {
-          const user = await UserDAO.getUserUnique({
+          const user = await repoUser.getDataUnique({
             email: username,
           });
           if (user) {
@@ -105,11 +108,11 @@ export const initializePassport = () => {
       { passReqToCallback: false, usernameField: "email" },
       async (username, password, done) => {
         try {
-          const user = await UserDAO.getUserUnique({
+          const user = await repoUser.getDataUnique({
             email: username,
           });
           if (user) {
-            const response = await UserDAO.updateUser(username, {
+            const response = await repoUser.updateData(username, {
               password: createHash(password),
             });
             response._doc && delete response._doc.password;
@@ -136,7 +139,7 @@ export const initializePassport = () => {
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
-          let user = await UserDAO.getUserUnique({
+          let user = await repoUser.getDataUnique({
             email: profile._json.email,
           });
           if (!user) {
@@ -147,7 +150,7 @@ export const initializePassport = () => {
               age: 0,
               password: "",
             };
-            const response = await UserDAO.addUser(newUser);
+            const response = await repoUser.addData(newUser);
             response._doc && delete response._doc.password;
             done(null, response);
           } else {
@@ -190,7 +193,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   try {
-    const User = await UserDAO.getUserUnique({
+    const User = await repoUser.getDataUnique({
       _id: id,
     });
     done(null, User);

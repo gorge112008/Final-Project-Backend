@@ -4,14 +4,15 @@ import {Command} from "commander";
 const program = new Command();
 
 program.option("--mode <mode>", "Execution mode", "development");
-
 program.parse();
 
-const enviroment = program.opts().mode.toUpperCase();
+const environment = program.opts().mode;
 
 dotenv.config({
-  path: enviroment === "PRODUCTION" ? ".env.prod" : ".env.dev",
+  path: environment === "development" ? ".env" : ".env.prod",
 });
+
+dotenv.config();
 
 const { USER_MONGO, PASS_MONGO, DB_MONGO, PORT } = process.env;
 

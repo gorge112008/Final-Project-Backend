@@ -1,7 +1,7 @@
 import { cartsModel } from "../models/carts.model.js";
 
 export default class CartsDao {
-    async getCarts() {
+    async getData() {
       try {
         const carts = await cartsModel.find();
         return carts;
@@ -9,7 +9,7 @@ export default class CartsDao {
         throw err;
       }
     }
-    async getCartId(id) {
+    async getDataId(id) {
       try {
         const cart = await cartsModel
           .find({ _id: id })
@@ -19,7 +19,7 @@ export default class CartsDao {
         throw err;
       }
     }
-    async addCart(newCart) {
+    async addData(newCart) {
       try {
         const cart = await cartsModel.create(newCart);
         return cart;
@@ -27,7 +27,7 @@ export default class CartsDao {
         throw err;
       }
     }
-    async updateCart(id, body) {
+    async updateData(id, body) {
       try {
         const cart = await cartsModel.findOneAndUpdate({ _id: id }, body, {
           new: true,
@@ -39,7 +39,7 @@ export default class CartsDao {
       }
     }
   
-    async deleteCart(id) {
+    async deleteData(id) {
       try {
         await cartsModel.findByIdAndDelete(id);
         return;

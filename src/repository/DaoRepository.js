@@ -3,32 +3,37 @@ export default class DaoRepository {
       this.dao = dao;
     }
   
-    async getProduct(limit, page, sort, query) {
-      const products = await this.dao.getProducts(limit, page, sort, query);
-      return products;
+    async getData(limit, page, sort, query) {
+      const datas = await this.dao.getData(limit, page, sort, query);
+      return datas;
     }
   
-    async getProductUniq(query) {
-      let product = await this.dao.getProductUnique(query);
-      return product;
+    async getDataUnique(query) {
+      let data = await this.dao.getDataUnique(query);
+      return data;
     }
   
     async getDataId(id) {
-      let product = await this.dao.getProductId(id);
-      return product;
+      let data = await this.dao.getDataId(id);
+      return data;
     }
-  
-    async addProduct(newProduct) {
-      let product = await this.dao.addProduct(newProduct);
-      return product;
+    
+    async getDatabyEmail(email) {
+        let data = await this.dao.getDatabyEmail(email);
+        return data;
     }
-    async updateProduct(id, body) {
-      let product = await this.dao.updateProduct(id, body);
-      return product;
+
+    async addData(newData) {
+      let data = await this.dao.addData(newData);
+      return data;
     }
-    async deleteProduct(id) {
-      let product = await this.dao.deleteProduct(id);
-      return product;
+    async updateData(id, body) {
+      let data = await this.dao.updateData(id, body);
+      return data;
+    }
+    async deleteData(id) {
+      let data = await this.dao.deleteData(id);
+      return data;
     }
   }
   

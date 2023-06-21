@@ -1,7 +1,7 @@
 import { messagesModel } from "../models/messages.model.js";
 
 export default class MessageDao {
-    async getMessages() {
+    async getData() {
       try {
         const messages = await messagesModel.find();
         return messages;
@@ -9,7 +9,7 @@ export default class MessageDao {
         throw err;
       }
     }
-    async getMessageId(id) {
+    async getDataId(id) {
       try {
         const message = await messagesModel.find({ _id: id });
         return message;
@@ -17,7 +17,7 @@ export default class MessageDao {
         throw err;
       }
     }
-    async addMessage(newMessage) {
+    async addData(newMessage) {
       try {
         const message = await messagesModel.create(newMessage);
         return message;
@@ -25,7 +25,7 @@ export default class MessageDao {
         throw err;
       }
     }
-    async updateMessage(id, body) {
+    async updateData(id, body) {
       try {
         const message = await messagesModel.findOneAndUpdate({ _id: id }, body, {
           new: true,
@@ -37,7 +37,7 @@ export default class MessageDao {
       }
     }
   
-    async deleteMessage(id) {
+    async deleteData(id) {
       try {
         await messagesModel.findByIdAndDelete(id);
         return;

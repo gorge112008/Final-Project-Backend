@@ -1,10 +1,14 @@
 //import { CartDAO, ProductDAO } from "../dao/Mongo/classes/DBmanager.js";
 import { CartDAO, ProductDAO } from "../dao/index.js";
+import DaoRepository from "../repository/DaoRepository.js";
+
+const repoProduct = new DaoRepository(ProductDAO);
+const repoCart = new DaoRepository(CartDAO);
 
 const cartController = {
   getCarts: async (req, res) => {
     try {
-      let carts = await CartDAO.getCarts();
+      let carts = await repoCart.getData();
       res.sendSuccess(200, carts);
     } catch (err) {
       res.sendServerError({ error: err });
@@ -13,7 +17,7 @@ const cartController = {
   getCartId: async (req, res) => {
     try {
       const cid = req.params.cid;
-      let cart = await CartDAO.getCartId(cid);
+      let cart = await repoCart.getDataId(cid);
       res.sendSuccess(200, cart);
     } catch (err) {
       res.sendServerError({ error: err });
@@ -22,7 +26,7 @@ const cartController = {
   addCart: async (req, res) => {
     try {
       const newCart = req.body;
-      const response = await CartDAO.addCart(newCart);
+      const response = await repoCart.addData(newCart);
       res.sendSuccess(200, response);
     } catch (err) {
       res.sendServerError({ error: err });
@@ -51,7 +55,7 @@ const cartController = {
         });
         newProducts[0].payload = productsFind;
         reqProducts.products = newProducts[0];
-        const response = await CartDAO.updateCart(cid, reqProducts);
+        const response = await repoCart.updateData(cid, reqProducts);
         res.sendSuccess(200, response);
       } else {
         res.sendUserError(400, {
@@ -66,9 +70,9 @@ const cartController = {
     try {
       const cid = req.params.cid;
       const pid = req.params.pid;
-      const arrayProducts = await CartDAO.getCarts();
-      const responsecid = await CartDAO.getCartId(cid);
-      const responsepid = await ProductDAO.getProductId(pid);
+      const arrayProducts = await repoCart.getData();
+      const responsecid = await repoCart.getDataId(cid);
+      const responsepid = await repoProduct.getDatatId(pid);
       if (!isNaN(responsepid) || !isNaN(responsecid)) {
         res.sendUserError(400, { error: `Error --> The route is not valid` });
       } else {
@@ -98,7 +102,7 @@ const cartController = {
               });
             }
             const updateProducts = { products: cartProducts[0] };
-            await CartDAO.updateCart(cid, updateProducts);
+            await repoCart.updateData(cid, updateProducts);
           }
         });
       }
@@ -110,9 +114,9 @@ const cartController = {
     try {
       const cid = req.params.cid;
       const reqProducts = req.body;
-      let cart = await CartDAO.getCartId(cid);
+      let cart = await repoCart.getDataId(cid);
       cart[0].products = [{ status: "sucess", payload: reqProducts }];
-      const response = await CartDAO.updateCart(cid, cart[0]);
+      const response = await repoCart.updateData(cid, cart[0]);
       res.sendSuccess(200, response);
     } catch (err) {
       res.sendServerError({ error: err });
@@ -124,9 +128,9 @@ const cartController = {
       const quantity = req.body.quantity;
       const cid = req.params.cid;
       const pid = req.params.pid;
-      const arrayProducts = await CartDAO.getCarts();
-      const responsecid = await CartDAO.getCartId(cid);
-      const responsepid = await ProductDAO.getProductId(pid);
+      const arrayProducts = await repoCart.getData();
+      const responsecid = await repoCart.getDataId(cid);
+      const responsepid = await repoProduct.getDataId(pid);
       if (!isNaN(responsepid) || !isNaN(responsecid)) {
         res.sendUserError(404, { error: `Error --> The route is not valid` });
       } else {
@@ -165,7 +169,7 @@ const cartController = {
               res.sendSuccess(200, msj);
             }
             const updateProducts = { products: cartProducts[0] };
-            await CartDAO.updateCart(cid, updateProducts);
+            await repoCart.updateData(cid, updateProducts);
           }
         });
       }
@@ -176,7 +180,7 @@ const cartController = {
   deleteCart: async (req, res) => {
     try {
       const cid = req.params.cid;
-      await CartDAO.deleteCart(cid);
+      await repoCart.deleteData(cid);
       res.sendSuccess(200, { msj: "DELETED CART SUCCESSFULLY" });
     } catch (err) {
       res.sendServerError({ error: err });
@@ -185,9 +189,9 @@ const cartController = {
   deleteCartProducts: async (req, res) => {
     try {
       const cid = req.params.cid;
-      let cart = await CartDAO.getCartId(cid);
+      let cart = await repoCart.getDataId(cid);
       cart[0].products = [{ status: "sucess", payload: [] }];
-      const response = await CartDAO.updateCart(cid, cart[0]);
+      const response = await repoCart.updateData(cid, cart[0]);
       res.sendSuccess(200, response);
     } catch (err) {
       res.sendServerError({ error: err });
@@ -198,7 +202,7 @@ const cartController = {
     try {
       const cid = req.params.cid;
       const pid = req.params.pid;
-      const arrayCarts = await CartDAO.getCarts();
+      const arrayCarts = await repoCart.getData();
       arrayCarts.forEach(async (cartItem) => {
         if (cartItem._id == cid) {
           //SI EL ARREGLO TIENE LA ID DEL CARRITO SE ENTRA
@@ -214,7 +218,7 @@ const cartController = {
           newPayload != [] && payloadProducts == newPayload;
           cartProducts[0].payload = newPayload;
           const updateProducts = { products: cartProducts[0] };
-          await CartDAO.updateCart(cid, updateProducts);
+          await repoCart.updateData(cid, updateProducts);
           res.sendSuccess(200, { msj: "DELETED SUCCESSFULLY" });
         }
       });
