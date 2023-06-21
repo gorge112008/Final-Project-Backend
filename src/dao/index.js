@@ -7,7 +7,7 @@ import mongoMessagesDao from "./Mongo/classes/messages.dao.js";
 import mongoProductsDao from "./Mongo/classes/products.dao.js";
 import mongoUsersDao from "./Mongo/classes/users.dao.js";
 
-const persistence = process.argv[2];
+const persistence = process.argv[2]|| "MONGO";
 
 //MEMORY PERSISTENCE
 const MemoryProductDao = new memoryProductsDao();
