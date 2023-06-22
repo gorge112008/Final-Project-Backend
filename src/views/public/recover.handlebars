@@ -15,8 +15,38 @@
                   type="email"
                   id="user"
                   placeholder="Email Address"
+                  readonly
+                />
+              </div>
+            </li>
+            <li class="forgot__psw">
+              <div class="forgot__form__input">
+                <label class="forgot--label">New Password</label>
+                <input
+                  class="forgot__user forgot--input"
+                  type="password"
+                  id="password"
+                  placeholder="Enter password"
                   required
                 />
+                <button type="button" id="btnTogglePsw" class="RevealPsw">
+                  <i class="fa-regular fa-eye-slash">
+                  </i></button>
+              </div>
+            </li>
+            <li class="forgot__psw2">
+              <div class="forgot__form__input">
+                <label class="forgot--label">Repeat Password</label>
+                <input
+                  class="forgot__user forgot--input"
+                  type="password"
+                  id="passwordRep"
+                  placeholder="Repeat password"
+                  required
+                />
+                <button type="button" id="btnTogglePswRep" class="RevealPsw">
+                  <i class="fa-regular fa-eye-slash">
+                  </i></button>
               </div>
             </li>
           </ul>
@@ -48,4 +78,4 @@
   src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"
 ></script>
 <script src="/js/index.js"></script>
-<script src="/js/forgot.js"></script>
+<script src="/js/recover.js"></script>

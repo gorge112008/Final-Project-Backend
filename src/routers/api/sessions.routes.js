@@ -59,6 +59,12 @@ export default class SessionsRouter extends AppRouter {
       passportInit("forgot"),
       sessionController.postForgot
     );
+    this.postData(
+      "/sessions/recover",
+      ["PUBLIC"],
+      passportInit("recover"),
+      sessionController.postRecover
+    );
     this.getData("*", sessionController.getNotFound);
   }
 }

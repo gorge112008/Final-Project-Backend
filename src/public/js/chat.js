@@ -304,19 +304,3 @@ async function logoutSession() {
   }
 }
 
-async function delDataCookie(name) {
-  try {
-    fetch(UrlCook + "delCookie", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Credentials": true,
-      mode: "cors",
-      body: JSON.stringify(name),
-    });
-  } catch (error) {
-    console.log(error);
-  }
-}

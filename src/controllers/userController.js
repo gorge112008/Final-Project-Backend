@@ -1,4 +1,3 @@
-//import { UserDAO } from "../../dao/Mongo/classes/DBmanager.js";
 import { UserDAO } from "../dao/index.js";
 import DaoRepository from "../repository/DaoRepository.js";
 
@@ -34,6 +33,16 @@ const userController = {
     try {
         const newUser = req.body;
         const response = await repoUser.addData(newUser);
+        res.sendSuccess(200, response);
+      } catch (err) {
+        res.sendServerError({ error: err });
+      }
+  },
+  updateUser: async (req, res) => {
+    try {
+        const iud = req.params.iud;
+        const reqUser = req.body;
+        const response = await repoUser.updateData(iud, reqUser);
         res.sendSuccess(200, response);
       } catch (err) {
         res.sendServerError({ error: err });

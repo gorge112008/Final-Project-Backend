@@ -136,23 +136,6 @@ async function setDataCookie(data) {
   }
 }
 
-async function delDataCookie(name) {
-  try {
-    await fetch(UrlCook + "delCookie", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Credentials": true,
-      mode: "cors",
-      body: JSON.stringify(name),
-    });
-  } catch {
-    console.log(Error);
-  }
-}
-
 async function VerificateCookie() {
   try {
     const cookie = await getDataCookie("getUserCookie");

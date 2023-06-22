@@ -1,4 +1,3 @@
-//import { ProductDAO } from "../dao/Mongo/classes/DBmanager.js";
 import { ProductDAO } from "../dao/index.js";
 import DaoRepository from "../repository/DaoRepository.js";
 

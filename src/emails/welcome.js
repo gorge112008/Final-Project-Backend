@@ -1,4 +1,4 @@
-export const emailSend = {
+export const welcomeSend = {
   emailTemplate: function (name) {
     return `
     <!DOCTYPE html>

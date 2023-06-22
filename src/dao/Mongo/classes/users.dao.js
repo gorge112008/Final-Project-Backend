@@ -21,7 +21,7 @@ export default class UserDao {
 
   async getDataId(id) {
     try {
-      const User = await userModel.findOne({ _id: id }).populate("cart");
+      const User = await userModel.findOne({ _id: id }).populate("carts.cart");
       return User;
     } catch (err) {
       throw err;

@@ -1,6 +1,6 @@
 import { generateToken } from "../utils.js";
 import SessionDto from "../dao/DTOs/sessionDto.js";
-import {senderMail} from "../helpers/sender.js";
+import { senderMail } from "../helpers/sender.js";
 
 const sessionController = {
   getSession: async (req, res) => {
@@ -93,8 +93,10 @@ const sessionController = {
     try {
       if (req.user && !req.user.error) {
         senderMail
-          .Sender(req.user)
-          .then((dat) => console.log(dat))
+          .SenderWelcome(req.user)
+          .then((dat) => {
+            console.log(dat);
+          })
           .catch((err) => console.log(err));
         const msj = {
           success: `Email ${req.user.email} successfully registered`,
@@ -108,6 +110,23 @@ const sessionController = {
     }
   },
   postForgot: async (req, res) => {
+    try {
+      senderMail
+        .SenderRecover(req.user)
+        .then((dat) => {
+          res.cookie("RecoveryUser", req.user.email, {
+            maxAge: 30 * 60 * 1000,
+            signed: true,
+          });
+          const msj = { success: "Request Submitted successfully" };
+          res.sendSuccess(200, msj);
+        })
+        .catch((err) => {
+          res.sendServerError({ error: "Error Request Send" + err });
+        });
+    } catch (error) {}
+  },
+  postRecover: async (req, res) => {
     try {
       const msj = { success: "Success!" };
       res.sendSuccess(200, msj);

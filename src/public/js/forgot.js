@@ -9,26 +9,15 @@ let URLorigin = window.location.origin,
 
 const form = document.querySelector("form"),
   Login = document.querySelector(".btnLogin"),
-  inputUser = document.getElementById("user"),
-  inputPassword = document.getElementById("password"),
-  inputPasswordRep = document.getElementById("passwordRep"),
-  btnViewPsw = document.getElementById("btnTogglePsw"),
-  btnViewPswRep = document.getElementById("btnTogglePswRep");
-
-const psw1 = document.querySelector(".forgot__psw"),
-  psw2 = document.querySelector(".forgot__psw2");
-
-psw1.classList.remove("hidden"); //UNLOCK PASSWORD UNTIL IMPLEMENT VALIDATION
-psw2.classList.remove("hidden"); //UNLOCK PASSWORD2 UNTIL IMPLEMENT VALIDATION
+  inputUser = document.getElementById("user");
 
 /*****************************************************************CLASES*************************************************************/
 class RecoveryUser {
   constructor() {
     this.email = inputUser.value;
-    this.password = inputPassword.value;
+    this.password = "123";
   }
 }
-
 /*********************************************************FUNCIONES*************************************************************/
 async function VerificateSession() {
   try {
@@ -83,7 +72,7 @@ async function VerificateSession() {
   }
 }
 
-async function sendRecovery(data) {
+async function sendRecover(data) {
   try {
     let response = await fetch(UrlForgot, {
       method: "POST",
@@ -121,47 +110,18 @@ async function startSession(user) {
   }
 }
 
-async function setDataCookie(data) {
-  try {
-    fetch(UrlCook + "setUserCookie", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Credentials": true,
-      mode: "cors",
-      body: JSON.stringify(data),
-    });
-  } catch {
-    console.log(Error);
-  }
-}
-
 /*********************************************************EVENTOS*************************************************************/
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-  if (inputPassword.value === inputPasswordRep.value) {
     const recoveryValues = new RecoveryUser();
-    const { status, recoveryData } = await sendRecovery(recoveryValues);
+    const { status, recoveryData } = await sendRecover(recoveryValues);
     if (status === 200) {
-      setDataCookie({ user: recoveryValues.email, timer: 300000 }); //Cookie de sesion nueva registrada, duración 5 min.
-      const { sessionData } = await startSession(recoveryValues);
-      const userSession = sessionData.session;
-      sessionStorage.setItem(
-        "userSession",
-        JSON.stringify({ msj: sessionData.success, role: userSession.role })
-      );
-      setTimeout(() => {
-        window.location.href = "../products";
-      },3000),
         Swal.fire({
           position: "center",
           icon: "success",
-          title: "Recovery Password Success!!!" ,
-          text: "Logging in...",
-          showConfirmButton: false,
+          title: recoveryData.success ,
+          text: "Check your gmail inbox please!",
           allowOutsideClick: false,
         });
     } else if (status === 404 || 401) {
@@ -181,39 +141,11 @@ form.addEventListener("submit", async (e) => {
         }
       });
     }
-  } else {
-    Swal.fire({
-      title: "Passwords do not match!",
-      text: "Check your passwords please",
-      icon: "error",
-      confirmButtonText: "Accept",
-    });
-  }
 });
 
 Login.addEventListener("click", async (e) => {
   e.preventDefault();
   window.location.href = "../login";
-});
-
-btnViewPsw.addEventListener("click", function () {
-  if (inputPassword.type === "password") {
-    inputPassword.type = "text";
-    btnViewPsw.innerHTML = `<i class="fa-regular fa-eye"></i>`;
-  } else {
-    inputPassword.type = "password";
-    btnViewPsw.innerHTML = `<i class="fa-regular fa-eye-slash"></i>`;
-  }
-});
-
-btnViewPswRep.addEventListener("click", function () {
-  if (inputPasswordRep.type === "password") {
-    inputPasswordRep.type = "text";
-    btnViewPswRep.innerHTML = `<i class="fa-regular fa-eye"></i>`;
-  } else {
-    inputPasswordRep.type = "password";
-    btnViewPswRep.innerHTML = `<i class="fa-regular fa-eye-slash"></i>`;
-  }
 });
 
 VerificateSession();

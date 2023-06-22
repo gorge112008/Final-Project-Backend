@@ -1,4 +1,3 @@
-//import { CartDAO, ProductDAO } from "../dao/Mongo/classes/DBmanager.js";
 import { CartDAO, ProductDAO } from "../dao/index.js";
 import DaoRepository from "../repository/DaoRepository.js";
 
@@ -25,6 +24,8 @@ const cartController = {
   },
   addCart: async (req, res) => {
     try {
+     // console.log("USER"+req.session.user._id);
+      //await repoUser.updateData(iud, reqUser);
       const newCart = req.body;
       const response = await repoCart.addData(newCart);
       res.sendSuccess(200, response);

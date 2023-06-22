@@ -8,10 +8,16 @@ const usersSchema = new mongoose.Schema({
   email: { type: String, unique: true, require: true, index: true },
   password: String,
   age: Number,
-  cart: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "carts",
-    default: null,
+  carts: {
+    type: [
+      {
+        cart: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "carts",
+        },
+      },
+    ],
+    default: [],
   },
   role: { type: String, default: "user" },
 });

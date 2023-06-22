@@ -16,6 +16,9 @@ const publicController = {
   forgot: (req, res) => {
     res.render("public/forgot", { isLogin: true, style: "/css/forgot.css" });
   },
+  recover: (req, res) => {
+    res.render("public/recover", { isLogin: true, style: "/css/forgot.css" });
+  },
   github: (req, res) => {
     const { msj, role } = req.cookies.login;
     res.clearCookie("login");

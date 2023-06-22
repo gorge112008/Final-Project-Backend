@@ -23,6 +23,8 @@ export default class ViewsRouter extends AppRouter {
 
     this.getRoute("/forgot", ["PUBLIC"], publicController.forgot);
 
+    this.getRoute("/recover", ["PUBLIC"], publicController.recover);
+
     this.getRoute("/github", ["PUBLIC"], publicController.github);
 
     this.getRoute("/profile", ["USER"],validateSession, publicController.profile);

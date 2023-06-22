@@ -1,6 +1,5 @@
 import passport from "passport";
 import local from "passport-local";
-//import { UserDAO } from "../dao/Mongo/classes/DBmanager.js";
 import { UserDAO } from "../dao/index.js";
 import { createHash, isValidPassword } from "../utils.js";
 import jwt from "passport-jwt";
@@ -107,7 +106,29 @@ export const initializePassport = () => {
     new LocalStrategy(
       { passReqToCallback: false, usernameField: "email" },
       async (username, password, done) => {
+        try { 
+          const user = await repoUser.getDataUnique({
+            email: username,
+          });
+          if (user){
+            return done(null, user);
+          }else{
+            const err = { message: "User not found" };
+            return done(null, false, err);
+          }
+        } catch (error) {
+          return done(error);
+        }
+      }
+    )
+  );
+  passport.use(
+    "recover",
+    new LocalStrategy(
+      { passReqToCallback: false, usernameField: "email" },
+      async (username, password, done) => {
         try {
+          console.log("LLEGA A PASAR?");
           const user = await repoUser.getDataUnique({
             email: username,
           });

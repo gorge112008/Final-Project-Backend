@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
-import { emailSend } from "../email.js";
+import { welcomeSend } from "../emails/welcome.js";
+import { recoverSend } from "../emails/recover.js";
 import { __dirname } from "../utils.js";
 import path from "path";
 import twilio from "twilio";
@@ -14,35 +15,57 @@ const client = twilio(
   TWILIO_PHONE_NUMBER
 );
 
-export const senderMail = {
-  Sender: async function (userSend) {
-    const { first_name, email, user } = userSend;
-    let testAccount = await nodemailer.createTestAccount();
-    let transporter = nodemailer.createTransport({
-      service: "gmail",
-      port: 2525,
-      auth: {
-        user: "gorgexc4@gmail.com",
-        pass: "rgcsrngjiwfdutjt",
-      },
-    });
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  port: 2525,
+  auth: {
+    user: "gorgexc4@gmail.com",
+    pass: "rgcsrngjiwfdutjt",
+  },
+});
 
-    let info = await transporter.sendMail({
-      from: '"JorgeBack ☀️" <gorgexc4@gmail.com>', // direccion de envio
-      to: email, // lista de quienes reciben
-      subject: `Welcome, Hello ${first_name}🥳✔`, // Asunto
-      text: "Welcome to Delipaso", // Texto plano
-      html: emailSend.emailTemplate(first_name), // Email html
-      attachments: [
+let testAccount = await nodemailer.createTestAccount();
+
+class newData {
+  constructor(email, subject, text, html, attachments) {
+    (this.from = '"JorgeBack ☀️" <gorgexc4@gmail.com>'),
+      (this.to = email),
+      (this.subject = subject),
+      (this.text = text || ""),
+      (this.html = html),
+      (this.attachments = attachments || []);
+  }
+}
+
+export const senderMail = {
+  SenderWelcome: async function (userSend) {
+    const { first_name, email, user } = userSend;
+    const subject = `Welcome, Hello ${first_name}🥳✔`,
+      text = "Welcome to Delipaso",
+      html = welcomeSend.emailTemplate(first_name),
+      attachments = [
         {
           filename: "welcome.png",
           path: path.join(__dirname, "/public/assets/welcome.png"),
           cid: "welcome",
         },
-      ],
-    });
-    console.log("Message sent: %s", info.messageId);
-    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+      ];
+    const info = new newData(email, subject, text, html, attachments);
+    let newInfo = await transporter.sendMail(info);
+
+    console.log("Message sent: %s", newInfo.messageId);
+    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(newInfo));
+  },
+  SenderRecover: async function (userSend) {
+    const { first_name, email, user } = userSend;
+    const subject = `DELIPASO✔`,
+      text = "Recovery Password",
+      html = recoverSend.emailTemplate(email);
+    const info = new newData(email, subject, text, html);
+    let newInfo = await transporter.sendMail(info);
+
+    console.log("Message sent: %s", newInfo.messageId);
+    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(newInfo));
   },
 };
 export const senderSMS = {
@@ -57,7 +80,7 @@ export const senderSMS = {
     return result;
   },
   Whatsapp: async function (messageSend) {
-    let { message} = messageSend;
+    let { message } = messageSend;
     let result = client.messages.create({
       body: `${message}`,
       from: "whatsapp:+14849399573",

@@ -31,6 +31,14 @@ const cookiesController = {
       res.sendServerError({ error: "Error reading session " + error });
     }
   },
+  getRecoveryCookie: async (req, res) => {
+    try {
+      const recoveryCookie = req.signedCookies.RecoveryUser;
+      recoveryCookie ? res.json(recoveryCookie) : res.json("");
+    } catch (error) {
+      res.sendServerError({ error: "Error reading session " + error });
+    }
+  },
   setUserCookie: async (req, res) => {
     try {
       const { user, timer } = req.body;
