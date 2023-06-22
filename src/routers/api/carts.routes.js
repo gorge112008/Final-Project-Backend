@@ -1,5 +1,6 @@
 import AppRouter from "../router.js";
 import cartController from "../../controllers/cartController.js";
+import { authEndp } from "../../middlewares/authEndP.js";
 
 export default class CartsRouter extends AppRouter {
   constructor() {
@@ -38,7 +39,7 @@ export default class CartsRouter extends AppRouter {
     this.updateData("/carts/:cid", ["USER"], cartController.updateCart);
     this.updateData(
       "/carts/:cid/products/:pid",
-      ["USER"],
+      ["USER"],authEndp.User,
       cartController.updateCartProductId
     );
     /*****************************************************************DELETE*************************************************************/

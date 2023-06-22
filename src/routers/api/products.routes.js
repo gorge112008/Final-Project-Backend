@@ -25,7 +25,7 @@ export default class ProductsRouter extends AppRouter {
     this.getData("/products/:pid", ["PUBLIC"], productController.getProductId);
 
     /*****************************************************************POST***************************************************************/
-    this.postData("/products", ["USER"], productController.addProduct);
+    this.postData("/products", ["USER"],productController.addProduct);
 
     /*****************************************************************DELETE*************************************************************/
     this.updateData(
