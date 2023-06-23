@@ -34,7 +34,7 @@ const productController = {
     try {
       const pid = req.params.pid;
       const body = req.body;
-      let response = await repoProduct.updateData(pid, body);
+      let response = await repoProduct.updateData({_id: pid}, body);
       res.sendSuccess(200, response);
     } catch (err) {
       res.sendServerError({ error: err });

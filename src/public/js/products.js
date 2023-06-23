@@ -2,12 +2,13 @@
 /*********************************************************CONSTANTES/VARIABLES*************************************************************/
 const socket = io();
 let URLorigin = window.location.origin,
+  UrlU = URLorigin + "/api/users",
   UrlP = URLorigin + "/api/products",
   UrlC = URLorigin + "/api/carts",
   UrlLogin = URLorigin + "/api/sessions/",
   UrlCook = URLorigin + "/api/";
 let opc = "static";
-let btnAdd, options, dataPagination;
+let btnAdd, options, dataPagination, sessionUserID;
 let storeProducts = [],
   resExo = [],
   ListCarts = [];
@@ -110,8 +111,8 @@ async function createListCarts() {
   let optListCarts = [];
   ListCarts = [];
   for (let i = 1; i <= carts.length; i++) {
-    optListCarts[i] = `Cart (${i.toString()}): ${carts[i - 1]._id}`;
-    ListCarts.push(carts[i - 1]._id);
+    optListCarts[i] = `Cart (${i.toString()}): ${carts[i - 1].cart._id}`;
+    ListCarts.push(carts[i - 1].cart._id);
   }
   return optListCarts;
 }
@@ -455,14 +456,14 @@ async function getDatabyID(id) {
 
 async function getDataCart() {
   try {
-    let response = await fetch(`${UrlC}`, {
+    let response = await fetch(`${UrlU}/${sessionUserID}`, {
       method: "GET",
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Credentials": true,
       mode: "cors",
     });
     const data = await response.json();
-    return data;
+    return data.carts;
   } catch {
     console.log(Error);
   }
@@ -558,7 +559,8 @@ async function getDataCookie(name) {
 /*****************************************************************SOCKETS*************************************************************/
 
 socket.on("callProductsPublic", async (getProducts) => {
-  Object.assign(storeProducts, getProducts); //ASIGNAR PRODUCTOS AL STORE
+  sessionUserID=getProducts.id;
+  Object.assign(storeProducts, getProducts.products); //ASIGNAR PRODUCTOS AL STORE
   sessionStorage.removeItem("values");
   if (storeProducts.length == 1) {
     sessionStorage.setItem("productView", storeProducts[0]._id);

@@ -75,7 +75,7 @@ async function initSocketServer(server) {
     });
 
     socket.on("NewCart", async (msj) => {
-      io.emit("NewCart", msj);
+      socket.emit("NewCart", msj);
     });
 
     socket.on("transferCart", async (msj) => {

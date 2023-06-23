@@ -42,7 +42,7 @@ const userController = {
     try {
         const iud = req.params.iud;
         const reqUser = req.body;
-        const response = await repoUser.updateData(iud, reqUser);
+        const response = await repoUser.updateData({_id:iud}, reqUser);
         res.sendSuccess(200, response);
       } catch (err) {
         res.sendServerError({ error: err });

@@ -25,9 +25,9 @@ export default class MessageDao {
         throw err;
       }
     }
-    async updateData(id, body) {
+    async updateData(query, body) {
       try {
-        const message = await messagesModel.findOneAndUpdate({ _id: id }, body, {
+        const message = await messagesModel.findOneAndUpdate(query, body, {
           new: true,
           upsert: true,
         });

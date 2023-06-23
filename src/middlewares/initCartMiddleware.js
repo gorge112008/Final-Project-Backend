@@ -6,23 +6,18 @@ const middlewareInitCart = async (req, res, next) => {
     const Url = `${req.protocol}://${req.hostname}:${config.mongo.port}`;
     const route = req.params.cid
       ? `/api/carts/${req.params.cid}`
-      : `/api/carts`;
+      : `/api/users/${req.session.user._id}`;
     const resCarts = await axios.get(`${Url}${route}`, {
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Credentials": true,
       },
     });
-    /*const route2 = `/api/users/${req.session.user._id}`;
-    const reUser = await axios.get(`${Url}${route2}`, {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Credentials": true,
-      },
-    });
-
-    console.log("REVISAR USUARIO" + JSON.stringify(reUser.data));*/
-    res.locals.resCarts = resCarts.data;
+    if (req.params.cid) {
+      res.locals.resCarts = resCarts.data;
+    } else {
+      res.locals.resCarts = resCarts.data.carts;
+    }
     /*PRUEBA SIN CARTS*/
     //res.locals.resCarts=[];
     next();

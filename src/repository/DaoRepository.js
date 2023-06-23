@@ -27,8 +27,8 @@ export default class DaoRepository {
       let data = await this.dao.addData(newData);
       return data;
     }
-    async updateData(id, body) {
-      let data = await this.dao.updateData(id, body);
+    async updateData(query, body) {
+      let data = await this.dao.updateData(query, body);
       return data;
     }
     async deleteData(id) {

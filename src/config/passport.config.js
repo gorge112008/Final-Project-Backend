@@ -33,6 +33,7 @@ export const initializePassport = () => {
             };
             const response = await repoUser.addData(newUser);
             response._doc && delete response._doc.password;
+            response._doc && delete response._doc.carts;
             return done(null, response);
           } else {
             return done(null, false, { message: "User already exists" });
@@ -81,6 +82,7 @@ export const initializePassport = () => {
                     return done(null, false, err);
                   } else {
                     user._doc && delete user._doc.password; //IMPORTANT: delete password from user
+                    user._doc && delete user._doc.carts;
                     return done(null, user);
                   }
                 }
@@ -111,6 +113,8 @@ export const initializePassport = () => {
             email: username,
           });
           if (user){
+            user._doc && delete user._doc.password; //IMPORTANT: delete password from user
+            user._doc && delete user._doc.carts;
             return done(null, user);
           }else{
             const err = { message: "User not found" };
@@ -128,15 +132,15 @@ export const initializePassport = () => {
       { passReqToCallback: false, usernameField: "email" },
       async (username, password, done) => {
         try {
-          console.log("LLEGA A PASAR?");
           const user = await repoUser.getDataUnique({
             email: username,
           });
           if (user) {
-            const response = await repoUser.updateData(username, {
+            const response = await repoUser.updateData({email: username}, {
               password: createHash(password),
             });
-            response._doc && delete response._doc.password;
+            response._doc && delete response._doc.password;//IMPORTANT: delete password from user
+            response._doc && delete response._doc.carts;
             return done(null, response);
           } else {
             const err = {
@@ -173,9 +177,11 @@ export const initializePassport = () => {
             };
             const response = await repoUser.addData(newUser);
             response._doc && delete response._doc.password;
+            response._doc && delete response._doc.carts;
             done(null, response);
           } else {
             user._doc && delete user._doc.password;
+            user._doc && delete user._doc.carts;
             done(null, user);
           }
         } catch (error) {

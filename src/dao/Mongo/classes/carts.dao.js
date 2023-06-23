@@ -27,9 +27,9 @@ export default class CartsDao {
         throw err;
       }
     }
-    async updateData(id, body) {
+    async updateData(query, body) {
       try {
-        const cart = await cartsModel.findOneAndUpdate({ _id: id }, body, {
+        const cart = await cartsModel.findOneAndUpdate(query, body, {
           new: true,
           upsert: true,
         });

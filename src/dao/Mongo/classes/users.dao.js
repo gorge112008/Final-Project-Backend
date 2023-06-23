@@ -29,7 +29,7 @@ export default class UserDao {
   }
   async getDatabyEmail(email) {
     try {
-      const User = await userModel.findOne({ email: email });
+      const User = await userModel.findOne({ email: email }).populate("carts.cart");
       return User;
     } catch (err) {
       throw err;
@@ -43,9 +43,9 @@ export default class UserDao {
       throw err;
     }
   }
-  async updateData(email, body) {
+  async updateData(query, body) {
     try {
-      const User = await userModel.findOneAndUpdate({ email: email }, body, {
+      const User = await userModel.findOneAndUpdate(query, body, {
         new: true,
         upsert: true,
       });

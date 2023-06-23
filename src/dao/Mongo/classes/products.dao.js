@@ -39,9 +39,9 @@ export default class ProductDao {
       throw err;
     }
   }
-  async updateData(id, body) {
+  async updateData(query, body) {
     try {
-      const product = await productsModel.findOneAndUpdate({ _id: id }, body, {
+      const product = await productsModel.findOneAndUpdate(query, body, {
         new: true,
         upsert: true,
       });

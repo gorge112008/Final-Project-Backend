@@ -43,19 +43,22 @@ const publicController = {
     });
   },
   products: (req, res) => {
-    const { role, email } = req.user.user;
-    const user = req.user;
-    publicProducts = res.locals.resProducts;
+    const { _id, role, email } = req.user.user;
+    publicProducts = { id: _id, products: res.locals.resProducts };
     res.render("public/products", {
       role: role,
       user: email,
-      body: publicProducts,
+      body: publicProducts.products,
     });
   },
   carts: (req, res) => {
-    const { role, email } = req.user.user;
-    publicCarts = res.locals.resCarts;
-    res.render("public/cart", { role: role, user: email, body: publicCarts });
+    const { _id, role, email } = req.user.user;
+    publicCarts = { id: _id, carts: res.locals.resCarts };
+    res.render("public/cart", {
+      role: role,
+      user: email,
+      body: publicCarts.carts,
+    });
   },
   chat: (req, res) => {
     const { role, email } = req.user.user;

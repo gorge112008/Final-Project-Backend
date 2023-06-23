@@ -28,7 +28,6 @@ export const authEndp = {
   },
   Public: function async(req, res, next) {
     try {
-        console.log("REVISANDO USER"+JSON.stringify(req.session));
         next();
         } catch (error) {
         const err = { error: "Internal Server Error" };

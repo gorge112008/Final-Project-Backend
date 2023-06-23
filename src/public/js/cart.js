@@ -5,9 +5,16 @@ const socket = io();
 let URLorigin = window.location.origin,
   UrlP = URLorigin + "/api/products",
   UrlC = URLorigin + "/api/carts",
+  UrlU = URLorigin + "/api/users",
   UrlCook = URLorigin + "/api/";
+UrlException = URLorigin + "/api/exceptional/";
 let opc = "static";
-let btnRemove, btnCloseView, btnRemoveCart, btnTransferCart, options;
+let btnRemove,
+  btnCloseView,
+  btnRemoveCart,
+  btnTransferCart,
+  options,
+  sessionUserID;
 let storeCarts = [],
   storeProducts = [],
   resExo = [],
@@ -34,6 +41,26 @@ class NewDataCart {
 }
 
 /*****************************************************************FUNCIONES*************************************************************/
+async function authExceptional(role) {
+  try {
+    const token = await getDataCookie("getTokenCookie");
+    let response = await fetch(UrlException + role, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+        Authorization: `Bearer ${token}`,
+      },
+      mode: "cors",
+    });
+    const dataRes = await response.json();
+    return { status: response.status, sessionData: dataRes };
+  } catch {
+    console.log(Error);
+  }
+}
+
 async function createListStock(stock) {
   let optListStock = [];
   for (let i = 1; i <= stock; i++) {
@@ -47,11 +74,11 @@ async function createListCarts(idCart) {
   let optListCarts = [];
   ListCarts = [];
   for (let i = 1; i <= carts.length; i++) {
-    if (idCart != carts[i - 1]._id) {
-      optListCarts[i] = `Cart (${i.toString()}): ${carts[i - 1]._id}`;
-      ListCarts.push(carts[i - 1]._id);
+    if (idCart != carts[i - 1].cart._id) {
+      optListCarts[i] = `Cart (${i.toString()}): ${carts[i - 1].cart._id}`;
+      ListCarts.push(carts[i - 1].cart._id);
     } else {
-      ListCarts.push(carts[i - 1]._id);
+      ListCarts.push(carts[i - 1].cart._id);
     }
   }
   return optListCarts;
@@ -76,7 +103,8 @@ async function createHTMLCarts() {
     containCart.innerHTML = "";
     let html;
     let int = -1;
-    for (const cart of storeCarts) {
+    for (const listCarts of storeCarts) {
+      let cart = listCarts.cart;
       let countQuantity = 0;
       let cartDetails = cart.products;
       let productsCart = cartDetails[0].payload;
@@ -289,9 +317,7 @@ async function validateStock(idProduct, stockModif, action) {
 }
 
 async function validateCartStock(idCart) {
-  console.log("LLEGA?");
   const listProducts = await getDataProductsbyID(idCart);
-  console.log("INICIA"+JSON.stringify(listProducts));
   if (listProducts) {
     for (const product of listProducts) {
       const idProduct = product.product._id;
@@ -300,7 +326,6 @@ async function validateCartStock(idCart) {
       await validateStock(idProduct, stockModif, action);
     }
   }
-  console.log("sale");
 }
 
 async function validatePayload(payload, listProducts) {
@@ -480,21 +505,25 @@ async function selectBtnCartProducts() {
           }).then(async (result) => {
             if (result.isConfirmed) {
               const idCart = storeCarts[0]._id;
-              validateStock(idProduct, +quantity, 1);
-              deletedProductCart(idCart, idProduct)
+              authExceptional("user")
                 .then(async (data) => {
                   if (data.status === 200) {
-                    Swal.fire({
-                      title: "Product Removed Successfully!!!",
-                      text: "Product Removed>> " + "ID: " + idProduct,
-                      icon: "success",
-                      confirmButtonText: "Accept",
-                    });
-                    socket.emit("updateproduct", "Updated Products");
-                    socket.emit(
-                      "removeProduct",
-                      `The Product ${productSelect[0].tittle} has been removed from cart`
-                    );
+                    await validateStock(idProduct, +quantity, 1);
+                    deletedProductCart(idCart, idProduct)
+                      .then(async (data) => {
+                        Swal.fire({
+                          title: "Product Removed Successfully!!!",
+                          text: "Product Removed>> " + "ID: " + idProduct,
+                          icon: "success",
+                          confirmButtonText: "Accept",
+                        });
+                        socket.emit("updateproduct", "Updated Products");
+                        socket.emit(
+                          "removeProduct",
+                          `The Product ${productSelect[0].tittle} has been removed from cart`
+                        );
+                      })
+                      .catch((error) => console.log("Error:" + error));
                   } else if (data.status === 401 || 403 || 404) {
                     console.warn("Client authorization expired or invalid");
                     Swal.fire(data.sessionData.error, "", "error");
@@ -520,7 +549,7 @@ async function selectBtnCartProducts() {
 
 async function selectRemoveCart() {
   try {
-    if (storeCarts != 0) {
+    if (storeCarts.length != 0) {
       [btnRemoveCart, btnTransferCart] = await createHTMLCarts();
       btnRemoveCart.forEach((selectBtn) => {
         selectBtn.addEventListener("click", async (e) => {
@@ -537,21 +566,25 @@ async function selectRemoveCart() {
             denyButtonText: "NOT",
           }).then(async (result) => {
             if (result.isConfirmed) {
-              await validateCartStock(cardSelect[0]._id);
-              deleteCart(cardSelect[0]._id)
+              authExceptional("user")
                 .then(async (data) => {
                   if (data.status === 200) {
-                    Swal.fire({
-                      title: "Cart Removed Successfully!!!",
-                      text: "Cart Removed>> " + "ID: " + cardSelect[0]._id,
-                      icon: "success",
-                      confirmButtonText: "Accept",
-                    });
-                    socket.emit("updateproduct", "Updated Products");
-                    socket.emit(
-                      "removeCart",
-                      `Cart ${cardSelect[0]._id} Removed`
-                    );
+                    await validateCartStock(cardSelect[0]._id);
+                    deleteCart(cardSelect[0]._id)
+                      .then(async (data) => {
+                        Swal.fire({
+                          title: "Cart Removed Successfully!!!",
+                          text: "Cart Removed>> " + "ID: " + cardSelect[0]._id,
+                          icon: "success",
+                          confirmButtonText: "Accept",
+                        });
+                        socket.emit("updateproduct", "Updated Products");
+                        socket.emit(
+                          "removeCart",
+                          `Cart ${cardSelect[0]._id} Removed`
+                        );
+                      })
+                      .catch((error) => console.log("Error:" + error));
                   } else if (data.status === 401 || 403 || 404) {
                     console.warn("Client authorization expired or invalid");
                     Swal.fire(data.sessionData.error, "", "error");
@@ -592,21 +625,26 @@ async function selectRemoveCart() {
                 denyButtonText: "NOT",
               }).then(async (result) => {
                 if (result.isConfirmed) {
-                  TransferCart(btnTransfer, selectedCartId)
+                  authExceptional("user")
                     .then(async (data) => {
                       if (data.status === 200) {
-                        Swal.fire({
-                          title: "Cart Transferred Successfully!!!",
-                          text: "Cart Transferred>> " + "ID: " + btnTransfer,
-                          icon: "success",
-                          confirmButtonText: "Accept",
-                        });
-                        await deleteCart(btnTransfer);
-                        socket.emit("updateproduct", "Updated Products");
-                        socket.emit(
-                          "transferCart",
-                          `The cart ${btnTransfer} has been transferred to cart ${data.sessionData._id}`
-                        );
+                        TransferCart(btnTransfer, selectedCartId)
+                          .then(async (data) => {
+                            Swal.fire({
+                              title: "Cart Transferred Successfully!!!",
+                              text:
+                                "Cart Transferred>> " + "ID: " + btnTransfer,
+                              icon: "success",
+                              confirmButtonText: "Accept",
+                            });
+                            await deleteCart(btnTransfer);
+                            socket.emit("updateproduct", "Updated Products");
+                            socket.emit(
+                              "transferCart",
+                              `The cart ${btnTransfer} has been transferred to cart ${data.sessionData._id}`
+                            );
+                          })
+                          .catch((error) => console.log("Error:" + error));
                       } else if (data.status === 401 || 403 || 404) {
                         console.warn("Client authorization expired or invalid");
                         Swal.fire(data.sessionData.error, "", "error");
@@ -634,14 +672,14 @@ async function selectRemoveCart() {
 /*INICIO FUNCIONES CRUD*/
 async function getDataCarts() {
   try {
-    let response = await fetch(`${UrlC}`, {
+    let response = await fetch(`${UrlU}/${sessionUserID}`, {
       method: "GET",
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Credentials": true,
       mode: "cors",
     });
     const data = await response.json();
-    return data;
+    return data.carts;
   } catch {
     console.log(Error);
   }
@@ -655,7 +693,6 @@ async function getDataCartsbyID(id) {
     mode: "cors",
   });
   const data = await response.json();
-  console.log("data"+JSON.stringify(data));
   return data;
 }
 
@@ -857,7 +894,8 @@ async function getDataCookie(name) {
 /*****************************************************************SOCKETS*************************************************************/
 
 socket.on("callCarts", async (getCarts) => {
-  Object.assign(storeCarts, getCarts);
+  sessionUserID = getCarts.id;
+  Object.assign(storeCarts, getCarts.carts);
   if (storeCarts.length == 1) {
     if (RouteIndex === "cartP") {
       storeCarts = await getDataCarts();
@@ -908,11 +946,6 @@ socket.on("emptyCart", async (msj) => {
 });
 
 socket.on("removeCart", async (msj) => {
-  console.log(msj);
-  selectAction();
-});
-
-socket.on("NewCart", async (msj) => {
   console.log(msj);
   selectAction();
 });
@@ -969,17 +1002,23 @@ btnAddNewCart.addEventListener("click", () => {
     denyButtonText: "NOT",
   }).then((result) => {
     if (result.isConfirmed) {
-      const cart = new NewCart();
-      createCart(cart)
+      authExceptional("user")
         .then(async (data) => {
           if (data.status === 200) {
-            Swal.fire({
-              title: "Cart Created Successfully!!!",
-              text: "Cart created>> " + "ID: " + data.sessionData._id,
-              icon: "success",
-              confirmButtonText: "Accept",
-            });
-            socket.emit("NewCart", `New cart ${data.sessionData._id} create`);
+            const cart = new NewCart();
+            createCart(cart)
+              .then(async (data) => {
+                console.log(JSON.stringify(data));
+                Swal.fire({
+                  title: "Cart Created Successfully!!!",
+                  text: "Cart created>> " + "ID: " + data.sessionData._id,
+                  icon: "success",
+                  confirmButtonText: "Accept",
+                });
+                console.log(`New cart ${data.sessionData._id} create`);
+                selectAction();
+              })
+              .catch((error) => console.log("Error:" + error));
           } else if (data.status === 401 || 403 || 404) {
             console.warn("Client authorization expired or invalid");
             Swal.fire(data.sessionData.error, "", "error");
@@ -1004,18 +1043,22 @@ btnClearCart.addEventListener("click", () => {
     denyButtonText: "NOT",
   }).then(async (result) => {
     if (result.isConfirmed) {
-      let idCart = storeCarts[0]._id;
-      await validateCartStock(idCart);
-      deleteAllProductsCart(idCart)
+      authExceptional("user")
         .then(async (data) => {
           if (data.status === 200) {
-            Swal.fire({
-              title: "All Products Cart Removed Successfully!!!",
-              text: "Cart Clean>> " + "ID: " + idCart,
-              icon: "success",
-              confirmButtonText: "Accept",
-            });
-            socket.emit("emptyCart", `Cart ${idCart} emptying`);
+            let idCart = storeCarts[0]._id;
+            await validateCartStock(idCart);
+            deleteAllProductsCart(idCart)
+              .then(async (data) => {
+                Swal.fire({
+                  title: "All Products Cart Removed Successfully!!!",
+                  text: "Cart Clean>> " + "ID: " + idCart,
+                  icon: "success",
+                  confirmButtonText: "Accept",
+                });
+                socket.emit("emptyCart", `Cart ${idCart} emptying`);
+              })
+              .catch((error) => console.log("Error:" + error));
           } else if (data.status === 401 || 403 || 404) {
             console.warn("Client authorization expired or invalid");
             Swal.fire(data.sessionData.error, "", "error");

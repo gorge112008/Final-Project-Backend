@@ -1,8 +1,9 @@
-import { CartDAO, ProductDAO } from "../dao/index.js";
+import { UserDAO, CartDAO, ProductDAO } from "../dao/index.js";
 import DaoRepository from "../repository/DaoRepository.js";
 
 const repoProduct = new DaoRepository(ProductDAO);
 const repoCart = new DaoRepository(CartDAO);
+const repoUser = new DaoRepository(UserDAO);
 
 const cartController = {
   getCarts: async (req, res) => {
@@ -22,12 +23,21 @@ const cartController = {
       res.sendServerError({ error: err });
     }
   },
+  getAuth: async (req, res) => {
+    try {
+      res.sendSuccess(200, req.session.user);
+    } catch (err) {
+      res.sendServerError({ error: err });
+    }
+  },
   addCart: async (req, res) => {
     try {
-     // console.log("USER"+req.session.user._id);
-      //await repoUser.updateData(iud, reqUser);
+      const { _id } = req.session.user;
+      const user = await repoUser.getDataId(_id);
       const newCart = req.body;
       const response = await repoCart.addData(newCart);
+      user.carts.push({ cart: response._id });
+      repoUser.updateData({ _id: _id }, user);
       res.sendSuccess(200, response);
     } catch (err) {
       res.sendServerError({ error: err });
@@ -56,7 +66,7 @@ const cartController = {
         });
         newProducts[0].payload = productsFind;
         reqProducts.products = newProducts[0];
-        const response = await repoCart.updateData(cid, reqProducts);
+        const response = await repoCart.updateData({ _id: cid }, reqProducts);
         res.sendSuccess(200, response);
       } else {
         res.sendUserError(400, {
@@ -71,41 +81,35 @@ const cartController = {
     try {
       const cid = req.params.cid;
       const pid = req.params.pid;
-      const arrayProducts = await repoCart.getData();
       const responsecid = await repoCart.getDataId(cid);
       const responsepid = await repoProduct.getDatatId(pid);
       if (!isNaN(responsepid) || !isNaN(responsecid)) {
         res.sendUserError(400, { error: `Error --> The route is not valid` });
       } else {
-        arrayProducts.forEach(async (cartItem) => {
-          //res.status(200).send("ARRAY"+cartItem._id+"CID:::"+cid);
-          if (cartItem._id == cid) {
-            //SI EL ARREGLO TIENE LA ID DEL CARRITO SE ENTRA
-            let find = 0;
-            const cartProducts = cartItem.products;
-            cartProducts[0].payload.forEach((productItem) => {
-              if (productItem.product == pid) {
-                //SI EL PRODUCTO TIENE LA ID REPETIDA SE SUMA
-                productItem.quantity++;
-                find = 1;
-                res.sendSuccess(200, {
-                  msj: "Product Added to Cart Successfully!!!",
-                });
-              }
+        //SI EL ARREGLO TIENE LA ID DEL CARRITO SE ENTRA
+        let find = 0;
+        const cartProducts = responsecid[0].products;
+        cartProducts[0].payload.forEach((productItem) => {
+          if (productItem.product._id == pid) {
+            //SI EL PRODUCTO TIENE LA ID REPETIDA SE SUMA
+            productItem.quantity++;
+            find = 1;
+            res.sendSuccess(200, {
+              msj: "Product Added to Cart Successfully!!!",
             });
-            if (find == 0) {
-              cartProducts[0].payload.push({
-                product: responsepid[0]._id,
-                quantity: 1,
-              });
-              res.sendSuccess(200, {
-                msj: "Product Added to Cart Successfully!!!",
-              });
-            }
-            const updateProducts = { products: cartProducts[0] };
-            await repoCart.updateData(cid, updateProducts);
           }
         });
+        if (find == 0) {
+          cartProducts[0].payload.push({
+            product: responsepid[0]._id,
+            quantity: 1,
+          });
+          res.sendSuccess(200, {
+            msj: "Product Added to Cart Successfully!!!",
+          });
+        }
+        const updateProducts = { products: cartProducts[0] };
+        await repoCart.updateData({ _id: cid }, updateProducts);
       }
     } catch (err) {
       res.sendServerError({ error: err });
@@ -117,7 +121,7 @@ const cartController = {
       const reqProducts = req.body;
       let cart = await repoCart.getDataId(cid);
       cart[0].products = [{ status: "sucess", payload: reqProducts }];
-      const response = await repoCart.updateData(cid, cart[0]);
+      const response = await repoCart.updateData({ _id: cid }, cart[0]);
       res.sendSuccess(200, response);
     } catch (err) {
       res.sendServerError({ error: err });
@@ -129,50 +133,44 @@ const cartController = {
       const quantity = req.body.quantity;
       const cid = req.params.cid;
       const pid = req.params.pid;
-      const arrayProducts = await repoCart.getData();
       const responsecid = await repoCart.getDataId(cid);
       const responsepid = await repoProduct.getDataId(pid);
       if (!isNaN(responsepid) || !isNaN(responsecid)) {
         res.sendUserError(404, { error: `Error --> The route is not valid` });
       } else {
-        arrayProducts.forEach(async (cartItem) => {
-          //res.status(200).send("ARRAY"+cartItem._id+"CID:::"+cid);
-          if (cartItem._id == cid) {
-            //SI EL ARREGLO TIENE LA ID DEL CARRITO SE ENTRA
-            let find = 0;
-            const cartProducts = cartItem.products;
-            cartProducts[0].payload.forEach((productItem) => {
-              if (productItem.product == pid) {
-                //SI EL PRODUCTO TIENE LA ID REPETIDA SE SUMA
-                let msj = "NULL ACTION";
-                if (stock > 0) {
-                  productItem.quantity += +stock;
-                  msj = { msj: "Product Added to Cart Successfully!!!" };
-                } else if (quantity > 0) {
-                  productItem.quantity -= +quantity;
-                  msj = { msj: "Product Deleted of Cart Successfully!!!" };
-                }
-                find = 1;
-                res.sendSuccess(200, msj);
-              }
-            });
-            if (find == 0) {
-              let msj = "NULL ACTION";
-              if (stock > 0) {
-                cartProducts[0].payload.push({
-                  product: responsepid[0]._id,
-                  quantity: stock,
-                });
-                msj = { msj: "Product Added to Cart Successfully!!!" };
-              } else if (quantity > 0) {
-                msj = { msj: "Product Added to Cart Failed - No stock" };
-              }
-              res.sendSuccess(200, msj);
+        //SI EL ARREGLO TIENE LA ID DEL CARRITO SE ENTRA
+        let find = 0;
+        const cartProducts = responsecid[0].products;
+        cartProducts[0].payload.forEach((productItem) => {
+          if (productItem.product._id == pid) {
+            //SI EL PRODUCTO TIENE LA ID REPETIDA SE SUMA
+            let msj = "NULL ACTION";
+            if (stock > 0) {
+              productItem.quantity += +stock;
+              msj = { msj: "Product Added to Cart Successfully!!!" };
+            } else if (quantity > 0) {
+              productItem.quantity -= +quantity;
+              msj = { msj: "Product Deleted of Cart Successfully!!!" };
             }
-            const updateProducts = { products: cartProducts[0] };
-            await repoCart.updateData(cid, updateProducts);
+            find = 1;
+            res.sendSuccess(200, msj);
           }
         });
+        if (find == 0) {
+          let msj = "NULL ACTION";
+          if (stock > 0) {
+            cartProducts[0].payload.push({
+              product: responsepid[0]._id,
+              quantity: stock,
+            });
+            msj = { msj: "Product Added to Cart Successfully!!!" };
+          } else if (quantity > 0) {
+            msj = { msj: "Product Added to Cart Failed - No stock" };
+          }
+          res.sendSuccess(200, msj);
+        }
+        const updateProducts = { products: cartProducts[0] };
+        await repoCart.updateData({ _id: cid }, updateProducts);
       }
     } catch (err) {
       res.sendServerError({ error: err });
@@ -180,7 +178,11 @@ const cartController = {
   },
   deleteCart: async (req, res) => {
     try {
+      const { _id } = req.session.user;
+      const user = await repoUser.getDataId(_id);
       const cid = req.params.cid;
+      user.carts = user.carts.filter((cart) => cart.cart._id != cid);
+      repoUser.updateData({ _id: _id }, user);
       await repoCart.deleteData(cid);
       res.sendSuccess(200, { msj: "DELETED CART SUCCESSFULLY" });
     } catch (err) {
@@ -192,7 +194,7 @@ const cartController = {
       const cid = req.params.cid;
       let cart = await repoCart.getDataId(cid);
       cart[0].products = [{ status: "sucess", payload: [] }];
-      const response = await repoCart.updateData(cid, cart[0]);
+      const response = await repoCart.updateData({ _id: cid }, cart[0]);
       res.sendSuccess(200, response);
     } catch (err) {
       res.sendServerError({ error: err });
@@ -219,7 +221,7 @@ const cartController = {
           newPayload != [] && payloadProducts == newPayload;
           cartProducts[0].payload = newPayload;
           const updateProducts = { products: cartProducts[0] };
-          await repoCart.updateData(cid, updateProducts);
+          await repoCart.updateData({ _id: cid }, updateProducts);
           res.sendSuccess(200, { msj: "DELETED SUCCESSFULLY" });
         }
       });

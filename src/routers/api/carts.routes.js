@@ -13,6 +13,8 @@ export default class CartsRouter extends AppRouter {
 
     this.getData("/carts/:cid", ["PUBLIC"], cartController.getCartId);
 
+    this.getData("/exceptional/user", ["USER"], authEndp.User,cartController.getAuth);
+
     //FORK PARA FUTURAS IMPLEMENTACIONES
     /* this.getData("/buyProcess", ["PUBLIC"], async (req, res) => {
       try {
@@ -43,15 +45,15 @@ export default class CartsRouter extends AppRouter {
       cartController.updateCartProductId
     );
     /*****************************************************************DELETE*************************************************************/
-    this.deleteData("/carts/:cid/delete", ["USER"], cartController.deleteCart);
+    this.deleteData("/carts/:cid/delete", ["USER"],authEndp.User, cartController.deleteCart);
     this.deleteData(
-      "/carts/:cid/products",
-      ["USER"],
+      "/carts/:cid",
+      ["USER"],authEndp.User,
       cartController.deleteCartProducts
     );
     this.deleteData(
       "/carts/:cid/products/:pid",
-      ["USER"],
+      ["USER"],authEndp.User,
       cartController.deleteCartProductId
     );
   }
