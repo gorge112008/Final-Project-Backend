@@ -42,7 +42,7 @@ class CartsManager {
       const parseContent = JSON.parse(content);
       return parseContent;
     } catch (error) {
-      console.log("Error: Not carts found.");
+      console.log("Error: Not products found.");
       return [];
     }
   }
@@ -52,22 +52,18 @@ class CartsManager {
       const arrayProducts = this.getProducts();
       const searchID = arrayProducts.find((item) => item.id == id);
       if (!searchID) {
-        console.log(`Not carts found with id ${id}`);
+        console.log(`Not products found with id ${id}`);
       } else {
         console.log(
-          `Carts found`
+          `Here's your product: ${JSON.stringify(searchID.description)}`
         );
         return searchID;
       }
       return [];
     } catch (error) {
-      console.error(`Not carts found with id ${id}`);
+      console.error(`Not products found with id ${id}`);
     }
   }
 }
 
-const cartsList = new CartsManager("./data/carts.json");
-
-module.exports = {
-  CartsManager: cartsList,
-};
+export const CartsMG = new CartsManager("./src/dao/FileSystem/data/carts.json");

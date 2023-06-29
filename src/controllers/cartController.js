@@ -1,9 +1,11 @@
-import { UserDAO, CartDAO, ProductDAO } from "../dao/index.js";
+import { UserDAO, CartDAO, ProductDAO, TicketDAO } from "../dao/index.js";
 import DaoRepository from "../repository/DaoRepository.js";
+import { CartsMG } from "../dao/FileSystem/CartsManager.js";
 
 const repoProduct = new DaoRepository(ProductDAO);
 const repoCart = new DaoRepository(CartDAO);
 const repoUser = new DaoRepository(UserDAO);
+const repoTicket = new DaoRepository(TicketDAO);
 
 const cartController = {
   getCarts: async (req, res) => {
@@ -18,6 +20,7 @@ const cartController = {
     try {
       const cid = req.params.cid;
       let cart = await repoCart.getDataId(cid);
+      let carts = await repoCart.getData();
       res.sendSuccess(200, cart);
     } catch (err) {
       res.sendServerError({ error: err });
@@ -115,12 +118,73 @@ const cartController = {
       res.sendServerError({ error: err });
     }
   },
+  purchaseCart: async (req, res) => {
+    try {
+      const data=req.body;
+      const response=repoTicket.addData(data);
+      res.sendSuccess(200,response);
+      /*const stock = req.body.stock;
+      const quantity = req.body.quantity;
+      const cid = req.params.cid;
+      const pid = req.params.pid;
+      let ProductAdd;
+      const responsecid = await repoCart.getDataId(cid);
+      const responsepid = await repoProduct.getDataId(pid);
+      if (!isNaN(responsepid) || !isNaN(responsecid)) {
+        res.sendUserError(404, { error: `Error --> The route is not valid` });
+      } else {
+        //SI EL ARREGLO TIENE LA ID DEL CARRITO SE ENTRA
+        let find = 0;
+        const cartProducts = responsecid[0].products;
+        cartProducts[0].payload.forEach((productItem) => {
+          if (productItem.product._id == pid) {
+            //SI EL PRODUCTO TIENE LA ID REPETIDA SE SUMA
+            let msj = "NULL ACTION";
+            if (stock > 0) {
+              productItem.quantity += +stock;
+              ProductAdd = productItem;
+              msj = { msj: "Product Added to Cart Successfully!!!" };
+            } else if (quantity > 0) {
+              productItem.quantity -= +quantity;
+              msj = { msj: "Product Deleted of Cart Successfully!!!" };
+            }
+            find = 1;
+            res.sendSuccess(200, msj);
+          }
+        });
+        if (find == 0) {
+          let msj = "NULL ACTION";
+          if (stock > 0) {
+            cartProducts[0].payload.push({
+              product: responsepid[0]._id,
+              quantity: stock,
+            });
+            //CartsMG.addProduct({
+            //  product: responsepid[0]._id,
+           //   quantity: stock,
+           // });
+            msj = { msj: "Product Added to Cart Successfully!!!" };
+          } else if (quantity > 0) {
+            msj = { msj: "Product Added to Cart Failed - No stock" };
+          }
+          res.sendSuccess(200, msj);
+        }
+        const updateProducts = { products: cartProducts[0] };
+        await repoCart.updateData({ _id: cid }, updateProducts);
+        //const da= CartsMG.addProduct(ProductAdd);
+        //console.log("SOLO MANDA MSJ"+JSON.stringify(da));
+      }*/
+    } catch (err) {
+      res.sendServerError({ error: err });
+    }
+  },
   updateCart: async (req, res) => {
     try {
       const cid = req.params.cid;
-      const reqProducts = req.body;
+      const { status, payload } = req.body;
       let cart = await repoCart.getDataId(cid);
-      cart[0].products = [{ status: "sucess", payload: reqProducts }];
+      const newPayload = payload ? payload : cart[0].products[0].payload;
+      cart[0].products = [{ status: status, payload: newPayload }];
       const response = await repoCart.updateData({ _id: cid }, cart[0]);
       res.sendSuccess(200, response);
     } catch (err) {
@@ -141,7 +205,7 @@ const cartController = {
         //SI EL ARREGLO TIENE LA ID DEL CARRITO SE ENTRA
         let find = 0;
         const cartProducts = responsecid[0].products;
-        cartProducts[0].payload.forEach((productItem) => {
+        cartProducts[0].payload.forEach(async (productItem) => {
           if (productItem.product._id == pid) {
             //SI EL PRODUCTO TIENE LA ID REPETIDA SE SUMA
             let msj = "NULL ACTION";
@@ -153,6 +217,8 @@ const cartController = {
               msj = { msj: "Product Deleted of Cart Successfully!!!" };
             }
             find = 1;
+            const updateProducts = { products: cartProducts[0] };
+            await repoCart.updateData({ _id: cid }, updateProducts);
             res.sendSuccess(200, msj);
           }
         });
@@ -167,10 +233,10 @@ const cartController = {
           } else if (quantity > 0) {
             msj = { msj: "Product Added to Cart Failed - No stock" };
           }
+          const updateProducts = { products: cartProducts[0] };
+          await repoCart.updateData({ _id: cid }, updateProducts);
           res.sendSuccess(200, msj);
         }
-        const updateProducts = { products: cartProducts[0] };
-        await repoCart.updateData({ _id: cid }, updateProducts);
       }
     } catch (err) {
       res.sendServerError({ error: err });

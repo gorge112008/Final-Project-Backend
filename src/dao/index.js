@@ -6,6 +6,7 @@ import mongoCartsDao from "./Mongo/classes/carts.dao.js";
 import mongoMessagesDao from "./Mongo/classes/messages.dao.js";
 import mongoProductsDao from "./Mongo/classes/products.dao.js";
 import mongoUsersDao from "./Mongo/classes/users.dao.js";
+import mongoTicketDao from "./Mongo/classes/ticket.dao.js";
 
 const persistence = process.argv[2]|| "MONGO";
 
@@ -17,10 +18,12 @@ const MongoCartDao = new mongoCartsDao();
 const MongoMessageDao = new mongoMessagesDao();
 const MongoProductDao = new mongoProductsDao();
 const MongoUserDao = new mongoUsersDao();
+const MongoTicketDao = new mongoTicketDao();
 
 //export const CartDAO = MongoCartDao;
 export const MessageDAO = MongoMessageDao;
 export const UserDAO = MongoUserDao;
+export const TicketDAO = MongoTicketDao;
 
 //Inicio por default mongo (npm start)
 //Iniciar persistencia en memoria (npm start memory)

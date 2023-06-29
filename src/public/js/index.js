@@ -12,7 +12,8 @@ const navHeader = document.querySelector(".header__nav"),
   btnAddNewProductMLD = document.querySelector(".btnAsideMLD"),
   btnAddNewProductSD = document.querySelector(".asideSD__dropdown--button"),
   btnExitCart = document.querySelector(".btnExitCart"),
-  btnClearCart = document.querySelector(".btnCleanCart");
+  btnClearCart = document.querySelector(".btnCleanCart"),
+  btnPurchase = document.querySelector(".purchaseCart");
 
 /*MLD*/
 const asideMLD = document.querySelector(".aside__MLD"),

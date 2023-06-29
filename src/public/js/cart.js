@@ -13,6 +13,7 @@ let btnRemove,
   btnCloseView,
   btnRemoveCart,
   btnTransferCart,
+  btnPurchaseCart,
   options,
   sessionUserID;
 let storeCarts = [],
@@ -24,19 +25,28 @@ let query = {};
 
 const staticContain = document.querySelector(".static__container--cart"),
   titleCart = document.querySelector(".static__tittleCart"),
-  containCart = document.querySelector(".container__cart");
+  containCart = document.querySelector(".container__cart"),
+  purchaseCart = document.querySelector(".purchaseCart"),
+  purchaseWarn = document.querySelector(".purchaseWarn");
 
 /*****************************************************************CLASES*************************************************************/
 
 class NewCart {
   constructor() {
-    this.products = [{ status: "sucess", payload: [] }];
+    this.products = [{ status: "success", payload: [] }];
   }
 }
 
 class NewDataCart {
   constructor() {
     this.payload = [];
+  }
+}
+
+class SuccessPurchase {
+  constructor(totalPurchase, email) {
+    this.amount = totalPurchase;
+    this.purchaser = { email: email };
   }
 }
 
@@ -61,12 +71,49 @@ async function authExceptional(role) {
   }
 }
 
-async function createListStock(stock) {
+/*async function createListStock(stock) {
   let optListStock = [];
   for (let i = 1; i <= stock; i++) {
     optListStock[i] = i.toString();
   }
   return optListStock;
+}*/
+
+async function validAddProduct(idCart, idProduct) {
+  const currentCart = await getDataCartsbyID(idCart);
+  const currentProduct = currentCart[0].products[0].payload.filter(
+    (product) => product.product._id == idProduct
+  );
+  let maxStock;
+  currentProduct[0].product.stock >= 20
+    ? (maxStock = 20)
+    : (maxStock = currentProduct[0].product.stock);
+  let stockAvaliable = maxStock - currentProduct[0].quantity;
+  let optListStock = [];
+  for (let i = 1; i <= stockAvaliable; i++) {
+    optListStock[i] = i.toString();
+  }
+  if (optListStock.length < 1) {
+    optListStock = null;
+  }
+  return { productSelect: currentProduct, listStock: optListStock };
+}
+
+async function validDelProduct(idCart, idProduct) {
+  const currentCart = await getDataCartsbyID(idCart);
+  const currentProduct = currentCart[0].products[0].payload.filter(
+    (product) => product.product._id == idProduct
+  );
+
+  let quantityAvaliable = currentProduct[0].quantity;
+  let optListStock = [];
+  for (let i = 1; i <= quantityAvaliable; i++) {
+    optListStock[i] = i.toString();
+  }
+  if (optListStock.length < 1) {
+    optListStock = null;
+  }
+  return { productSelect: currentProduct, listStock: optListStock };
 }
 
 async function createListCarts(idCart) {
@@ -104,14 +151,22 @@ async function createHTMLCarts() {
     let html;
     let int = -1;
     for (const listCarts of storeCarts) {
+      let statColor = "aquamarine",
+        warning = "",
+        warn = "hidden";
       let cart = listCarts.cart;
       let countQuantity = 0;
       let cartDetails = cart.products;
+      if (cartDetails[0].status === "failed") {
+        statColor = "lightOrange";
+        warning = "WarningPurchase";
+        warn = "";
+      }
       let productsCart = cartDetails[0].payload;
       const unique =
-        storeCarts.length == 1 || productsCart.length == [] ? "unique" : "";
+        storeCarts.length === 1 || productsCart.length === [] ? "unique" : "";
       if (productsCart.length == 0) {
-        //console.log("CART " + (int+1) + " EMPTY");
+        warning = "disabled";
       } else {
         for (const product of productsCart) {
           if (product.quantity) {
@@ -145,28 +200,38 @@ async function createHTMLCarts() {
               ></button>
               <button
                 type="button"
+                class="btn btnPurchaseCart ${warning}"
+                id=${cart._id}
+              >PROCESS PURCHASE<i
+              class="fa-solid fa-triangle-exclamation cartWarn ${warn}"
+              ></i></button>
+              <button
+                type="button"
                 class="btn fa-solid fa-arrow-right-arrow-left btnTransferCart ${unique}"
                 id=${cart._id}
               ></button>
+              <button
+              type="button"
+              class="btn btn-outline-warning btn-sm btnViewCart"
+               >
+              <a class="fa-regular fa-eye" href="/cart/${cart._id}"></a>
+               </button>
               <div class="card_containCart col s8 m8 l8">
                 <div class="loaded">
-                  <b>
+                  <div class="loaded--status"><b>
                     STATUS CARD:
-                    <u class="aquamarine">
+                    <u class=${statColor}>
                       ***${cartDetails[0].status.toUpperCase()}***
                     </u>
                   </b>
+                  </div>
+                  <div class="loaded--quantity">
                   <b>
                     QUANTITY OF PRODUCTS:
                     <b class="quantityP">${countQuantity}</b>
                   </b>
+                  </div>
                 </div>
-                <button
-                  type="button"
-                  class="btn btn-outline-warning btn-sm btnViewCart"
-                >
-                  <a class="fa-regular fa-eye" href="/cart/${cart._id}"></a>
-                </button>
               </div>
             </div>
           </div>
@@ -174,9 +239,10 @@ async function createHTMLCarts() {
       containCart.innerHTML += html;
     }
     titleCart.innerHTML = `<p>Carts (${storeCarts.length}):</p>`;
+    btnPurchaseCart = document.querySelectorAll(".btnPurchaseCart");
     btnTransferCart = document.querySelectorAll(".btnTransferCart");
     btnRemoveCart = document.querySelectorAll(".btnRemoveCart");
-    return [btnRemoveCart, btnTransferCart];
+    return [btnRemoveCart, btnTransferCart, btnPurchaseCart];
   }
 }
 
@@ -205,15 +271,21 @@ async function crearHTMLProductsCarts() {
         </div>
       </div>`;
     btnClearCart.classList.add("hidden");
+    btnPurchase.classList.add("hidden");
     btnAdd = document.querySelector(".btnAddProduct");
     return btnAdd;
   } else {
     containCart.innerHTML = "";
-    let html, error;
+    let html;
     let count = 0;
     for (const listProduct of storeProducts) {
       const product = listProduct.product;
-      product.stock == 0 ? (error = "error") : (error = "");
+      const maxStock = product.stock <= 20 ? product.stock : 20;
+      const checkStock = product.stock > 20 ? 20 : product.stock;
+      const addMax = listProduct.quantity >= checkStock ? "fullMax" : "";
+      const minMax = listProduct.quantity >= checkStock ? "fullMin" : "";
+      const failed =
+        listProduct.quantity > checkStock ? "failed" : "hiddenFailed";
       /*if (product == null || listProduct.quantity == 0) {
         deletedProductCart(storeCarts[0]._id, product._id);
         continue;
@@ -225,11 +297,13 @@ async function crearHTMLProductsCarts() {
             <div class="card-header--filled">
               <h5 class="card-title--filled">${product.tittle}</h5>
             </div>
+            <div class="card-img--filled">
             <img
               class="card-img-top--filled"
               src=${product.thumbnail}
               alt="Card image cap"
             />
+            </div>
             <div class="card-img-overlay">
               <button
                 type="button"
@@ -238,14 +312,14 @@ async function crearHTMLProductsCarts() {
               ></button>
               <button
                 type="button"
-                class="btn btn-outline-warning btn-sm btnUpdate--Min"
+                class="btn btn-outline-warning btn-sm btnUpdate--Min ${minMax}"
                 id=${product._id}
               >
                 <i class="fa-regular fa-square-minus"></i>
               </button>
               <button
                 type="button"
-                class="btn btn-outline-warning btn-sm btnUpdate--Max ${error}"
+                class="btn btn-outline-warning btn-sm btnUpdate--Max ${addMax}"
                 id=${product._id}
               >
                 <i class="fa-regular fa-square-plus"></i>
@@ -254,25 +328,40 @@ async function crearHTMLProductsCarts() {
             <div class="card-body">
               <b class="card-text--description">${product.description}</b>
               <u class="card-text--price">
-                Precio Unitario: S/${product.price}
+                Unit Price: S/${product.price}
               </u>
-              <b class="card-text--total">Precio Total: S/${total}</b>
+              <b class="card-text--total">Total Price: S/${total}</b>
             </div>
             <div class="card-footer">
               <b class="card-text--quantity">
-                Cantidad: <b class="quantity">${listProduct.quantity}</b>
+                Quantity: <b class="quantity">${listProduct.quantity}</b>
+              </b>
+              <b class="card-text--failed ${failed}" id=${product._id}>
+                <b class="productFailed">*Max. ${maxStock} Units*</b>
               </b>
             </div>
           </div>
         </div>`;
       containCart.innerHTML += html;
     }
+    existFailed = document.querySelectorAll(".failed");
+    if (Object.keys(existFailed).length > 0) {
+      updateCart(storeCarts[0]._id, { status: "failed" });
+      purchaseCart.classList.add("WarningPurchase");
+      purchaseWarn.classList.remove("hidden");
+    } else {
+      updateCart(storeCarts[0]._id, { status: "success" });
+      purchaseCart.classList.remove("WarningPurchase");
+      purchaseWarn.classList.add("hidden");
+    }
+    //console.log("MUESTRA FAILEDS"+JSON.stringify(Object.keys(existFailed).length));
     containCart.classList.replace("container__cart", "container__grid");
     staticContain.classList.replace(
       "static__container--cart",
       "static__container--grid"
     );
     btnClearCart.classList.remove("hidden");
+    btnPurchase.classList.remove("hidden");
     titleCart.innerHTML = `<p>Products Cart (${count}):</p>`;
     bnUpdateAdd = document.querySelectorAll(".btnUpdate--Max");
     btnUpdateDel = document.querySelectorAll(".btnUpdate--Min");
@@ -311,19 +400,16 @@ async function selectAction() {
 
 async function validateStock(idProduct, stockModif, action) {
   const product = await getDataOneProductbyID(idProduct);
-  const newStock =
-    action == 1 ? product[0].stock + stockModif : product[0].stock - stockModif;
+  const newStock = product[0].stock - stockModif;
   await updateOneProductbyID(idProduct, { stock: newStock });
 }
 
-async function validateCartStock(idCart) {
-  const listProducts = await getDataProductsbyID(idCart);
+async function validateCartStock(listProducts) {
   if (listProducts) {
     for (const product of listProducts) {
       const idProduct = product.product._id;
       const stockModif = product.quantity;
-      const action = 1;
-      await validateStock(idProduct, stockModif, action);
+      await validateStock(idProduct, stockModif);
     }
   }
 }
@@ -348,11 +434,27 @@ async function TransferCart(idCartTransfer, idCartReceptor) {
   const listProduct1 = await getDataProductsbyID(idCartTransfer);
   const listProduct2 = await getDataProductsbyID(idCartReceptor);
   const newArrCart = new NewDataCart();
+  let newStatus,
+    contaFailed = 0;
   let payload = newArrCart.payload;
   await validatePayload(payload, listProduct1).then(async (data) => {
     payload = await validatePayload(data, listProduct2);
+    for (const product of payload) {
+      const maxStock = product.product.stock <= 20 ? product.product.stock : 20;
+      if (product.quantity > maxStock) {
+        contaFailed++;
+      }
+    }
   });
-  const newListProduct = await putTransfCart(idCartReceptor, payload);
+  if (contaFailed > 0) {
+    newStatus = "failed";
+  } else {
+    newStatus = "success";
+  }
+  const newListProduct = await putTransfCart(idCartReceptor, {
+    status: newStatus,
+    payload: payload,
+  });
   return newListProduct;
 }
 
@@ -364,85 +466,89 @@ async function selectBtnCartProducts() {
         //ACTUALIZA SOLO LA CANTIDAD DEL PRODUCTO SELECCIONADO (SOLO AUMENTA)
         btnAdd.addEventListener("click", async (e) => {
           e.preventDefault();
+          const idCart = storeCarts[0]._id;
           const idProduct = btnAdd.id;
-          const productSelect = await getDataOneProductbyID(idProduct);
-          const pStock = productSelect[0].stock;
-          const optStock = await createListStock(pStock);
-          Swal.fire({
-            html: `How many ${productSelect[0].tittle} do you want to add to the cart?`,
-            input: "select",
-            inputOptions: optStock,
-            showDenyButton: true,
-            showCancelButton: false,
-            confirmButtonText: "YES",
-            denyButtonText: "NOT",
-          }).then(async (result) => {
-            if (result.isConfirmed) {
-              const selectValue = Swal.getPopup().querySelector("select").value;
-              const idCart = storeCarts[0]._id;
-              const quantity = { stock: selectValue };
-              validateStock(idProduct, +selectValue, 2);
-              updateData(idCart, idProduct, quantity)
-                .then(async (data) => {
-                  if (data.status === 200) {
-                    Swal.fire({
-                      title: "Product(s) Added Successfully!!!",
-                      text:
-                        "Product Added>> " +
-                        productSelect[0].tittle +
-                        " -->Quantity: " +
-                        selectValue,
-                      icon: "success",
-                      confirmButtonText: "Accept",
-                    });
-                    socket.emit("updateproduct", "Updated Products");
-                    socket.emit(
-                      "addingProductCart",
-                      `Has been added ${selectValue} ${productSelect[0].tittle} al carrito.`
-                    );
-                  } else if (data.status === 401 || 403 || 404) {
-                    console.warn("Client authorization expired or invalid");
-                    Swal.fire(data.sessionData.error, "", "error");
-                  }
-                })
-                .catch((error) => console.log("Error:" + error));
-            } else if (result.isDenied) {
-              Swal.fire("ACTION CANCELED", "", "info");
-            }
-          });
+          const validProduct = await validAddProduct(idCart, idProduct);
+          const { productSelect, listStock } = validProduct;
+          if (listStock) {
+            Swal.fire({
+              html: `How many ${productSelect[0].product.tittle} do you want to add to the cart?`,
+              input: "select",
+              inputOptions: listStock,
+              footer:
+                `Avaliable ${listStock.length - 1} Units` +
+                `\n` +
+                `(Max Units: 20)`,
+              showConfirmButton: true,
+              showDenyButton: true,
+              showCancelButton: false,
+              confirmButtonText: "ACCEPT",
+              denyButtonText: "CANCEL",
+            }).then(async (result) => {
+              if (result.isConfirmed) {
+                const selectValue =
+                  Swal.getPopup().querySelector("select").value;
+                const quantity = { stock: selectValue };
+                //validateStock(idProduct, +selectValue, 2);
+                updateData(idCart, idProduct, quantity)
+                  .then(async (data) => {
+                    if (data.status === 200) {
+                      Swal.fire({
+                        title: "Product(s) Added Successfully!!!",
+                        text:
+                          "Product Added>> " +
+                          productSelect[0].product.tittle +
+                          " -->Quantity: " +
+                          selectValue,
+                        icon: "success",
+                        confirmButtonText: "Accept",
+                      });
+                      socket.emit("updateproduct", "Updated Products");
+                      socket.emit(
+                        "addingProductCart",
+                        `Has been added ${selectValue} ${productSelect[0].product.tittle} al carrito.`
+                      );
+                    } else if (data.status === 401 || 403 || 404) {
+                      console.warn("Client authorization expired or invalid");
+                      Swal.fire(data.sessionData.error, "", "error");
+                    }
+                  })
+                  .catch((error) => console.log("Error:" + error));
+              } else if (result.isDenied) {
+                Swal.fire("ACTION CANCELED", "", "info");
+              }
+            });
+          } else {
+            Swal.fire(
+              "You have reached the maximum quantity for this product.",
+              "",
+              "error"
+            );
+          }
         });
       });
       btnUpdateDel.forEach((btnUpd) => {
         //ACTUALIZA SOLO LA CANTIDAD DEL PRODUCTO SELECCIONADO (SOLO DISMINUYE)
         btnUpd.addEventListener("click", async (e) => {
           e.preventDefault();
-          storeCarts = await getDataCartsbyID(storeCarts[0]._id);
-          let selectProduct;
-          let products = storeCarts[0].products[0].payload;
-          for (const listProduct of products) {
-            let product = listProduct.product;
-            product._id == btnUpd.id
-              ? (selectProduct = listProduct)
-              : (selectProduct = selectProduct);
-          }
-          const quantity = selectProduct.quantity;
+          const idCart = storeCarts[0]._id;
           const idProduct = btnUpd.id;
-          const optStock = await createListStock(quantity);
+          const validProduct = await validDelProduct(idCart, idProduct);
+          const { productSelect, listStock } = validProduct;
           Swal.fire({
-            html: `How many ${selectProduct.product.tittle} do you want to delete to the cart?`,
+            html: `How many ${productSelect[0].product.tittle} do you want to delete to the cart?`,
             input: "select",
-            inputOptions: optStock,
+            inputOptions: listStock,
             showDenyButton: true,
             showCancelButton: false,
-            confirmButtonText: "YES",
-            denyButtonText: "NOT",
+            confirmButtonText: "ACCEPT",
+            denyButtonText: "CANCEL",
           }).then(async (result) => {
             if (result.isConfirmed) {
               const selectValue = Swal.getPopup().querySelector("select").value;
-              const idCart = storeCarts[0]._id;
-              const lastValue = Object.keys(optStock).pop();
+              const lastValue = Object.keys(listStock).pop();
               const quantity = { quantity: selectValue };
-              validateStock(idProduct, +selectValue, 1);
+              //validateStock(idProduct, +selectValue, 1);
               const action =
                 lastValue == selectValue
                   ? deletedProductCart(idCart, idProduct)
@@ -454,7 +560,7 @@ async function selectBtnCartProducts() {
                       title: "Product(s) Deleted Successfully!!!",
                       text:
                         "Product Deleted>> " +
-                        selectProduct.product.tittle +
+                        productSelect[0].product.tittle +
                         " -->Quantity: " +
                         selectValue,
                       icon: "success",
@@ -463,7 +569,7 @@ async function selectBtnCartProducts() {
                     socket.emit("updateproduct", "Updated Products");
                     socket.emit(
                       "deletingProductCart",
-                      `Has been removed ${selectValue} ${selectProduct.product.tittle} del carrito.`
+                      `Has been removed ${selectValue} ${productSelect[0].product.tittle} del carrito.`
                     );
                   } else if (data.status === 401 || 403 || 404) {
                     console.warn("Client authorization expired or invalid");
@@ -490,7 +596,6 @@ async function selectBtnCartProducts() {
               ? (Product = listProduct)
               : (Product = Product);
           }
-          const quantity = Product.quantity;
           const idProduct = btnDel.id;
           const productSelect = await getDataOneProductbyID(idProduct);
           Swal.fire({
@@ -500,15 +605,15 @@ async function selectBtnCartProducts() {
               `<h6><b>(Remember that you will not be able to recover it!!!)<b><h6>`,
             showDenyButton: true,
             showCancelButton: false,
-            confirmButtonText: "YES",
-            denyButtonText: "NOT",
+            confirmButtonText: "DELETE PRODUCT",
+            denyButtonText: "CANCEL",
           }).then(async (result) => {
             if (result.isConfirmed) {
               const idCart = storeCarts[0]._id;
               authExceptional("user")
                 .then(async (data) => {
                   if (data.status === 200) {
-                    await validateStock(idProduct, +quantity, 1);
+                    //await validateStock(idProduct, +quantity, 1);
                     deletedProductCart(idCart, idProduct)
                       .then(async (data) => {
                         Swal.fire({
@@ -550,7 +655,8 @@ async function selectBtnCartProducts() {
 async function selectRemoveCart() {
   try {
     if (storeCarts.length != 0) {
-      [btnRemoveCart, btnTransferCart] = await createHTMLCarts();
+      [btnRemoveCart, btnTransferCart, btnPurchaseCart] =
+        await createHTMLCarts();
       btnRemoveCart.forEach((selectBtn) => {
         selectBtn.addEventListener("click", async (e) => {
           e.preventDefault();
@@ -562,14 +668,14 @@ async function selectRemoveCart() {
               `<h6><b>(Remember that you will not be able to recover it!!!)<b><h6>`,
             showDenyButton: true,
             showCancelButton: false,
-            confirmButtonText: "YES",
-            denyButtonText: "NOT",
+            confirmButtonText: "DELETE CART",
+            denyButtonText: "CANCEL",
           }).then(async (result) => {
             if (result.isConfirmed) {
               authExceptional("user")
                 .then(async (data) => {
                   if (data.status === 200) {
-                    await validateCartStock(cardSelect[0]._id);
+                    //await validateCartStock(cardSelect[0]._id);
                     deleteCart(cardSelect[0]._id)
                       .then(async (data) => {
                         Swal.fire({
@@ -608,8 +714,8 @@ async function selectRemoveCart() {
             inputOptions: optCarts,
             showDenyButton: true,
             showCancelButton: false,
-            confirmButtonText: "YES",
-            denyButtonText: "NOT",
+            confirmButtonText: "ACCEPT",
+            denyButtonText: "CANCEL",
           }).then(async (result) => {
             if (result.isConfirmed) {
               const numCart = Swal.getPopup().querySelector("select").value;
@@ -621,8 +727,8 @@ async function selectRemoveCart() {
                   `<h6><b>(Remember that the transferred cart will be deleted and cannot be recovered!!!)<b><h6>`,
                 showDenyButton: true,
                 showCancelButton: false,
-                confirmButtonText: "YES",
-                denyButtonText: "NOT",
+                confirmButtonText: "TRANSFER CART",
+                denyButtonText: "CANCEL",
               }).then(async (result) => {
                 if (result.isConfirmed) {
                   authExceptional("user")
@@ -661,6 +767,12 @@ async function selectRemoveCart() {
           });
         });
       });
+      btnPurchaseCart.forEach((selectBtn) => {
+        selectBtn.addEventListener("click", async (e) => {
+          e.preventDefault();
+          checkPurchaseCart(selectBtn.id);
+        });
+      });
     } else {
       createHTMLCarts();
     }
@@ -680,6 +792,21 @@ async function getDataCarts() {
     });
     const data = await response.json();
     return data.carts;
+  } catch {
+    console.log(Error);
+  }
+}
+
+async function getCurrentUser() {
+  try {
+    let response = await fetch(`${UrlU}/${sessionUserID}`, {
+      method: "GET",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": true,
+      mode: "cors",
+    });
+    const data = await response.json();
+    return data;
   } catch {
     console.log(Error);
   }
@@ -849,6 +976,27 @@ async function putTransfCart(idCart, data) {
   }
 }
 
+async function updateCart(idCart, data) {
+  try {
+    const token = await getDataCookie("getTokenCookie");
+    let response = await fetch(`${UrlC}/${idCart}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": true,
+      mode: "cors",
+      body: JSON.stringify(data),
+    });
+    const dataRes = await response.json();
+    return { status: response.status, sessionData: dataRes };
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 async function deleteCart(idCart) {
   try {
     const token = await getDataCookie("getTokenCookie");
@@ -894,30 +1042,32 @@ async function getDataCookie(name) {
 /*****************************************************************SOCKETS*************************************************************/
 
 socket.on("callCarts", async (getCarts) => {
-  sessionUserID = getCarts.id;
-  Object.assign(storeCarts, getCarts.carts);
-  if (storeCarts.length == 1) {
-    if (RouteIndex === "cartP") {
-      storeCarts = await getDataCarts();
-      storeProducts = [];
-      selectRemoveCart();
-    } else if (RouteIndex === "cartP/") {
-      sessionStorage.setItem("cartView", storeCarts[0]._id);
-      storeProducts = await getDataProductsbyID(storeCarts[0]._id);
-      selectBtnCartProducts();
+  if (getCarts) {
+    sessionUserID = getCarts.id;
+    Object.assign(storeCarts, getCarts.carts);
+    if (storeCarts.length == 1) {
+      if (RouteIndex === "cartP") {
+        storeCarts = await getDataCarts();
+        storeProducts = [];
+        selectRemoveCart();
+      } else if (RouteIndex === "cartP/") {
+        sessionStorage.setItem("cartView", storeCarts[0]._id);
+        storeProducts = await getDataProductsbyID(storeCarts[0]._id);
+        selectBtnCartProducts();
+      }
+    } else if (storeCarts.length != 1) {
+      if (RouteIndex === "cartP/") {
+        let idCart = sessionStorage.getItem("cartView");
+        storeProducts = await getDataProductsbyID(idCart);
+        selectBtnCartProducts();
+      } else if (RouteIndex === "cartP") {
+        storeCarts = await getDataCarts();
+        storeProducts = [];
+        selectRemoveCart();
+      }
     }
-  } else if (storeCarts.length != 1) {
-    if (RouteIndex === "cartP/") {
-      let idCart = sessionStorage.getItem("cartView");
-      storeProducts = await getDataProductsbyID(idCart);
-      selectBtnCartProducts();
-    } else if (RouteIndex === "cartP") {
-      storeCarts = await getDataCarts();
-      storeProducts = [];
-      selectRemoveCart();
-    }
+    focusAction();
   }
-  focusAction();
 });
 
 socket.on("addingProductCart", async (msj) => {
@@ -946,6 +1096,11 @@ socket.on("emptyCart", async (msj) => {
 });
 
 socket.on("removeCart", async (msj) => {
+  console.log(msj);
+  selectAction();
+});
+
+socket.on("purchaseCart", async (msj) => {
   console.log(msj);
   selectAction();
 });
@@ -1008,7 +1163,6 @@ btnAddNewCart.addEventListener("click", () => {
             const cart = new NewCart();
             createCart(cart)
               .then(async (data) => {
-                console.log(JSON.stringify(data));
                 Swal.fire({
                   title: "Cart Created Successfully!!!",
                   text: "Cart created>> " + "ID: " + data.sessionData._id,
@@ -1031,23 +1185,251 @@ btnAddNewCart.addEventListener("click", () => {
   });
 });
 
+async function createListProductsFailed(idCart) {
+  let newHtml = `<div><b>PRODUCTS OUT STOCK</b></div><div class="checkPurchase">`;
+  storeCarts = await getDataCartsbyID(idCart);
+  const payload = storeCarts[0].products[0].payload;
+  let contaFail = 0;
+  for (const product of payload) {
+    const currentProduct = await getDataOneProductbyID(product.product._id);
+    const stockMax =
+      currentProduct[0].stock <= 20 ? currentProduct[0].stock : 20;
+    if (product.quantity > stockMax) {
+      contaFail++;
+      let html = `<div class="container__checkPurchase__card--outStock">
+      <div class="card col s12">
+        <div class="card_cart--header row noMargin">
+          <div class="cart-header--filled col s12">
+            <h5 class="checkPurchase-title--filled">${product.product.tittle} </h5>
+          </div>
+        </div>
+        <div class="card_checkPurchase--body row noMargin">
+          <div class="card_imgcheckPurchase col s3 m3 l3">
+            <img
+              src=${product.product.thumbnail}
+              class="img-fluid rounded-start"
+              alt="..."
+            />
+          </div>
+          <div class="card_containcheckPurchase col s8 m8 l8">
+            <div class="loaded">
+              <div class="loaded--status">
+              <b>
+                MAX LIMIT STOCK: 
+                <b class="aquamarine size1rem">
+                ${stockMax}  
+                </b>
+              </b>
+              </div>
+              <div class="loaded--quantity">
+              <b>
+                QUANTITY ORDERED: 
+                <b class="lightOrange size1rem">
+                ${product.quantity}
+                </b>
+                <b class="quantityP"></b>
+              </b>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+      newHtml += html;
+    }
+  }
+  newHtml += `</div><div><b>These products will not proceed in the purchase, do you want to continue anyway?</b></div><div class="">`;
+  return { html: newHtml, contaFail: contaFail };
+}
+
+async function createListProductsPurchase(idCart) {
+  let productsPurchase = [],
+    productsFailed = [];
+  let newHtml = `<div><b>PRODUCTS PURCHASE</b></div><div class="checkPurchase">`;
+  storeCarts = await getDataCartsbyID(idCart);
+  const payload = storeCarts[0].products[0].payload;
+  let contaFail = 0,
+    totalPurchase = 0;
+  for (const product of payload) {
+    const currentProduct = await getDataOneProductbyID(product.product._id);
+    const totalPrice = product.product.price * product.quantity;
+    const stockMax =
+      currentProduct[0].stock <= 20 ? currentProduct[0].stock : 20;
+    if (product.quantity <= stockMax) {
+      productsPurchase.push(product);
+      totalPurchase += totalPrice;
+      contaFail++;
+      let html = `<div class="container__checkPurchase__card--getStock">
+      <div class="card col s12">
+        <div class="card_cart--header row noMargin">
+          <div class="cart-header--filled col s12">
+            <h5 class="checkPurchase-title--filled">${product.product.tittle} </h5>
+          </div>
+        </div>
+        <div class="card_checkPurchase--body row noMargin">
+          <div class="card_imgcheckPurchase col s3 m3 l3">
+            <img
+              src=${product.product.thumbnail}
+              class="img-fluid rounded-start"
+              alt="..."
+            />
+          </div>
+          <div class="card_containcheckPurchase col s8 m8 l8">
+            <div class="loaded">
+              <div class="loaded--status">
+              <b>
+                UNIT PRICE: 
+                <b class="skyBlue size1rem">
+                ${product.product.price}  
+                </b>
+              </b>
+              </div>
+              <div class="loaded--quantity">
+              <b>
+                QUANTITY ORDERED: 
+                <b class="skyBlue size1rem">
+                ${product.quantity}
+                </b>
+                <b class="quantityP"></b>
+              </b>
+              </div>
+              <div class="loaded--totalPrice">
+              <b>
+                TOTAL PRICE: 
+                <u class="aquamarine size1rem">
+                ${totalPrice}
+                </u>
+                <b class="quantityP"></b>
+              </b>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+      newHtml += html;
+    } else {
+      productsFailed.push(product);
+    }
+  }
+  newHtml += `</div><div><b>Total Purchase Amount: S/${totalPurchase}</b></div><div class="">`;
+  return {
+    html: newHtml,
+    totalPurchase: totalPurchase,
+    products: productsPurchase,
+    failed: productsFailed,
+  };
+}
+
+async function checkPurchaseCart(idCart) {
+  const { html, contaFail } = await createListProductsFailed(idCart);
+  if (contaFail > 0) {
+    updateCart(idCart, { status: "failed" });
+    Swal.fire({
+      html: html,
+      showDenyButton: true,
+      showCancelButton: false,
+      confirmButtonText: "CONTINUE PURCHASE",
+      denyButtonText: "CANCEL PURCHASE",
+    })
+      .then(async (result) => {
+        if (result.isConfirmed) {
+          completePurchaseCart(idCart);
+        } else if (result.isDenied) {
+          selectAction();
+          Swal.fire("ACTION CANCELED", "", "info");
+        }
+      })
+      .catch((error) => console.log("Error:" + error));
+  } else {
+    completePurchaseCart(idCart);
+  }
+}
+
+async function updatePurchaseCart(idCart, data) {
+  try {
+    const token = await getDataCookie("getTokenCookie");
+    let response = await fetch(`${UrlC}/${idCart}/purchase`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": true,
+      mode: "cors",
+      body: JSON.stringify(data),
+    });
+    const dataRes = await response.json();
+    return { status: response.status, sessionData: dataRes };
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function completePurchaseCart(idCart) {
+  const { html, totalPurchase, products, failed } =
+    await createListProductsPurchase(idCart);
+  Swal.fire({
+    html: html,
+    showDenyButton: true,
+    showCancelButton: false,
+    confirmButtonText: "CONFIRM PURCHASE",
+    denyButtonText: "CANCEL PURCHASE",
+  })
+    .then(async (result) => {
+      if (result.isConfirmed) {
+        const user = await getCurrentUser(sessionUserID);
+        const successPurchase = new SuccessPurchase(totalPurchase, user.email);
+        await validateCartStock(products);
+        updatePurchaseCart(idCart, successPurchase)
+          .then(async (data) => {
+            const status = failed.length > 0 ? "failed" : "success";
+            await updateCart(idCart, { status: status, payload: failed })
+              .then((data) => {
+                Swal.fire("PURCHASE SUCCESS", "", "success");
+                socket.emit("updateproduct", "Updated Products");
+                socket.emit(
+                  "purchaseCart",
+                  `The Purchase of the cart ${idCart} has been made Successfully.`
+                );
+              })
+              .catch((error) => {
+                console.log("Hubo un error en el update");
+              });
+          })
+          .catch((error) => {
+            console.log("OCURRIO UN ERROR CON EL UPDATE");
+          });
+      } else if (result.isDenied) {
+        Swal.fire("ACTION CANCELED", "", "info");
+      }
+    })
+    .catch((error) => console.log("Error:" + error));
+}
+
+purchaseCart.addEventListener("click", async () => {
+  checkPurchaseCart(storeCarts[0]._id);
+});
+
 btnClearCart.addEventListener("click", () => {
   Swal.fire({
     html:
+      `<div>Failed Products</div>` +
       `<h4>Are you sure to empty the cart??<h4>` +
       `\n` +
       `<h6><b>(Remember that you will not be able to recover it!!!)<b><h6>`,
     showDenyButton: true,
     showCancelButton: false,
-    confirmButtonText: "YES",
-    denyButtonText: "NOT",
+    confirmButtonText: "CLEAN CART",
+    denyButtonText: "CANCEL",
   }).then(async (result) => {
     if (result.isConfirmed) {
       authExceptional("user")
         .then(async (data) => {
           if (data.status === 200) {
             let idCart = storeCarts[0]._id;
-            await validateCartStock(idCart);
+            //await validateCartStock(idCart);
             deleteAllProductsCart(idCart)
               .then(async (data) => {
                 Swal.fire({

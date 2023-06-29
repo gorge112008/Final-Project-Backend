@@ -131,7 +131,7 @@ async function crearHtml() {
               <b class="card-text--code">
                 Code: <b class="code">${product.code}</b>
               </b>
-              <b class="card-text--stock ${empty}">
+              <b class="card-text--stock justEnd ${empty}">
                 Stock: <b> ${product.stock}</b>
               </b>
             </div>

@@ -74,6 +74,10 @@ async function initSocketServer(server) {
       io.emit("removeCart", msj);
     });
 
+    socket.on("purchaseCart", async (msj) => {
+      io.emit("purchaseCart", msj);
+    });
+
     socket.on("NewCart", async (msj) => {
       socket.emit("NewCart", msj);
     });

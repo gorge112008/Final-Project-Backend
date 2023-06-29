@@ -124,8 +124,4 @@ class ProductManager {
   }
 }
 
-const productList = new ProductManager("./data/products.json");
-
-module.exports = {
-  productManager: productList,
-};
+export const ProductsMG = new ProductManager("./data/products.json");
