@@ -1,5 +1,5 @@
 {
-  "name": "tercera-pre-entrega",
+  "name": "finalproyectbackend",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -11,16 +11,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gorge112008/tercera-pre-entrega.git"
+    "url": "git+https://github.com/gorge112008/Final-Proyect-Backend.git"
   },
   "keywords": [],
   "author": "Jorge Carlos Gayoso Ugas",
   "license": "ISC",
   "type": "module",
   "bugs": {
-    "url": "https://github.com/gorge112008/tercera-pre-entrega/issues"
+    "url": "https://github.com/gorge112008/Final-Proyect-Backend/issues"
   },
-  "homepage": "https://github.com/gorge112008/tercera-pre-entrega#readme",
+  "homepage": "https://github.com/gorge112008/Final-Proyect-Backend#readme",
   "dependencies": {
     "@handlebars/allow-prototype-access": "^1.0.5",
     "axios": "^1.4.0",
