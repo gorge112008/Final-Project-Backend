@@ -16,7 +16,7 @@ let storeProducts = [],
   ListCarts = [];
 let query = {};
 
-const tittleDinamic = document.querySelector(".dinamic__tittle--h3"),
+const titleDinamic = document.querySelector(".dinamic__title--h3"),
   form = document.querySelector("form"),
   formInput = document.querySelectorAll(".input-field label"),
   btnviewClose = document.querySelector(".btnViewClose"),
@@ -27,7 +27,7 @@ const dinamicPages = document.querySelector(".dinav__pages--center"),
   selectNextPage = document.getElementById("page__btnDer");
 
 const validateProducts = document.getElementById("validate"),
-  inputTittle = document.getElementById("tittle"),
+  inputTitle = document.getElementById("title"),
   inputDescription = document.getElementById("description"),
   inputCode = document.getElementById("code"),
   inputPrice = document.getElementById("price"),
@@ -176,7 +176,7 @@ async function createHtml() {
       html = `<div class="container__grid__card">
           <div class="card">
             <div class="card-header--filled">
-              <h5 class="card-title--filled">${product.tittle}</h5>
+              <h5 class="card-title--filled">${product.title}</h5>
             </div>
             <img
               class="card-img-top--filled"
@@ -234,8 +234,8 @@ function validarUrl() {
 async function selectAction() {
   if (RouteIndex === "productP/") {
     categoryOption.value = storeProducts[0].category;
-    tittleDinamic.innerHTML = "View Product";
-    inputTittle.value = storeProducts[0].tittle;
+    titleDinamic.innerHTML = "View Product";
+    inputTitle.value = storeProducts[0].title;
     inputDescription.value = storeProducts[0].description;
     inputCode.value = storeProducts[0].code;
     inputPrice.value = storeProducts[0].price;
@@ -284,7 +284,7 @@ async function selectAddCart() {
             const { productSelect, listStock } = validProduct;
             if (listStock) {
               Swal.fire({
-                html: `How many ${productSelect[0].tittle} do you want to add to the cart?`,
+                html: `How many ${productSelect[0].title} do you want to add to the cart?`,
                 input: "select",
                 inputOptions: listStock,
                 footer:
@@ -306,14 +306,14 @@ async function selectAddCart() {
                       if (data.status === 200) {
                         Swal.fire({
                           title: data.sessionData.msj,
-                          text: `"Product Added>>ID: ${idProduct} --> ${productSelect[0].tittle}`,
+                          text: `"Product Added>>ID: ${idProduct} --> ${productSelect[0].title}`,
                           icon: "success",
                           confirmButtonText: "Accept",
                         });
                         socket.emit("updateproduct", "Updated Products");
                         socket.emit(
                           "addingProductCart",
-                          `Has been added ${selectValue} ${productSelect[0].tittle} al carrito ${numCart}.`
+                          `Has been added ${selectValue} ${productSelect[0].title} al carrito ${numCart}.`
                         );
                       } else if (data.status === 401 || 403 || 404) {
                         console.warn("Client authorization expired or invalid");

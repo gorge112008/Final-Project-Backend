@@ -694,12 +694,12 @@
   left: -50vw;
 }
 
-.dinamic__tittle {
+.dinamic__title {
   margin: 0;
   padding: 0;
 }
 
-.dinamic__tittle--addProduct {
+.dinamic__title--addProduct {
   position: sticky;
   margin: 0;
   top: 0;
@@ -817,7 +817,7 @@
 }
 
 /*STATIC TITLE BLOCK*/
-.static__tittle {
+.static__title {
   position: relative;
   display: block;
   z-index: 2;
@@ -825,14 +825,14 @@
   height: 5vh;
 }
 
-.static__tittle p {
+.static__title p {
   margin: 0;
   position: static;
   font-size: 2rem;
   font-family: "Sinami", sans-serif;
 }
 
-.static__tittleCart {
+.static__titleCart {
   background-color: transparent;
   position: relative;
   display: flex;
@@ -843,7 +843,7 @@
   z-index: 2;
 }
 
-.static__tittleCart p {
+.static__titleCart p {
   margin: 0;
   position: relative;
   display: flex;
@@ -1447,6 +1447,110 @@
   width: 100%;
 }
 
+
+.checkPurchase{
+  height: 50vh;
+  width: 100%;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.container__checkPurchase__card--outStock {
+  height: 15vh;
+  width: 90%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  background-color: rgb(251, 215, 211);
+}
+
+.container__checkPurchase__card--getStock {
+  height: 15vh;
+  width: 90%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  background-color: rgb(211, 250, 251);
+}
+
+.container__checkPurchase__card--outStock .card,
+.container__checkPurchase__card--getStock .card  {
+  position: relative;
+  width:90%;
+  height: 10vh;
+  margin: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border: solid rgb(255, 162, 0) 2px;
+}
+
+.checkPurchase-title--filled {
+  font-size: 2vh;
+  margin: 0;
+  margin-top: 5px;
+  opacity: 0.8;
+  color: black;
+  background: #ffbb77;
+  position: sticky;
+  display: block;
+  font-family: "TT Marxiana Trial", sans-serif;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 2;
+  transition: all 500ms ease;
+}
+
+.card_checkPurchase--body {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  height: 70%;
+}
+
+.card_imgcheckPurchase {
+  position: relative;
+  height: 6vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  object-fit: cover;
+  overflow: hidden;
+  border-bottom: solid black 3px;
+  border-bottom-left-radius: 10%;
+  border-bottom-right-radius: 10%;
+  background: rgb(36, 238, 144);
+}
+
+.card_imgcheckPurchase img {
+  width: 7vh;
+  height: 6vh;
+  border: solid rgb(3, 11, 125) 1px;
+}
+
+.card_containcheckPurchase {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  text-align: center;
+  height: 60%;
+  width: 100%;
+  font-size: 0.8rem;
+}
+
 /*BUTTONS BLOCK*/
 .btnUpdate {
   background-color: transparent;
@@ -1939,7 +2043,7 @@
   padding: 0;
 }
 
-.chat__login--tittle {
+.chat__login--title {
   color: rgb(46, 12, 200);
   font-family: "g Glegar", sans-serif;
   font-size: 2.5rem;
@@ -1997,7 +2101,7 @@
   top: 6vh;
 }
 
-.chat__tittle {
+.chat__title {
   background-color: white;
   position: sticky;
   top: 0;
@@ -2009,7 +2113,7 @@
   background-color: rgb(175, 255, 175);
 }
 
-.chat__tittle u {
+.chat__title u {
   margin: 0;
   margin-top: 10px;
   position: relative;
@@ -2041,6 +2145,57 @@
   height: 60vh;
   overflow: scroll;
   overflow-x: hidden;
+}
+
+
+.chat__container__dinamic::-webkit-scrollbar,
+.chat__container__dinamic::-webkit-scrollbar {
+  width: 10px;
+  background-color: #f5f5f5;
+}
+
+.chat__container__dinamic::-webkit-scrollbar-button:decrement:start,
+.chat__container__dinamic::-webkit-scrollbar-button:decrement:start {
+  border: solid black 1px;
+  height: 3vh;
+  border-radius: 4px;
+}
+.chat__container__dinamic::-webkit-scrollbar-button:increment:end,
+.chat__container__dinamic::-webkit-scrollbar-button:increment:end {
+  border: solid black 1px;
+  height: 3vh;
+  border-radius: 4px;
+}
+
+.chat__container__dinamic::-webkit-scrollbar-button:active,
+.chat__container__dinamic::-webkit-scrollbar-button:active {
+  background-color: yellow;
+}
+
+.chat__container__dinamic::-webkit-scrollbar-thumb,
+.chat__container__dinamic::-webkit-scrollbar-thumb {
+  background-color: rgb(159, 255, 201);
+  border: solid black 1px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.chat__container__dinamic::-webkit-scrollbar-thumb:hover,
+.chat__container__dinamic::-webkit-scrollbar-thumb:hover {
+  cursor: pointer;
+  background-color: #87f792;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+.chat__container__dinamic::-webkit-scrollbar-track,
+.chat__container__dinamic::-webkit-scrollbar-track {
+  background: #e1e1e1;
+  border-radius: 4px;
+}
+
+.chat__container__dinamic::-webkit-scrollbar-track:hover,
+.chat__container__dinamic::-webkit-scrollbar-track:hover {
+  background: #d4d4d4;
 }
 
 /*CHAT MESSAGE BLOCK*/
@@ -2232,7 +2387,7 @@
   }
 
   /*DEVICE CEL CHAT BLOCK*/
-  .chat__tittle u {
+  .chat__title u {
     font-size: 5vh;
   }
 }
@@ -2368,7 +2523,7 @@
   }
 
   /*DEVICE LAP CHAT BLOCK*/
-  .chat__tittle u {
+  .chat__title u {
     font-size: 3.5vw;
   }
 
@@ -2463,107 +2618,4 @@
   flex-direction: column;
   text-align: center;
   cursor: progress;
-}
-
-.checkPurchase{
-  height: 50vh;
-  width: 100%;
-  overflow: auto;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  overflow-x: hidden;
-}
-
-.container__checkPurchase__card--outStock {
-  height: 15vh;
-  width: 90%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 10px;
-  background-color: rgb(251, 215, 211);
-}
-
-.container__checkPurchase__card--getStock {
-  height: 15vh;
-  width: 90%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 10px;
-  background-color: rgb(211, 250, 251);
-}
-
-.container__checkPurchase__card--outStock .card,
-.container__checkPurchase__card--getStock .card  {
-  position: relative;
-  width:90%;
-  height: 10vh;
-  margin: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  border: solid rgb(255, 162, 0) 2px;
-}
-
-.checkPurchase-title--filled {
-  font-size: 2vh;
-  margin: 0;
-  margin-top: 5px;
-  opacity: 0.8;
-  color: black;
-  background: #ffbb77;
-  position: sticky;
-  display: block;
-  font-family: "TT Marxiana Trial", sans-serif;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  z-index: 2;
-  transition: all 500ms ease;
-}
-
-.card_checkPurchase--body {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: center;
-  height: 70%;
-}
-
-.card_imgcheckPurchase {
-  position: relative;
-  height: 6vh;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  object-fit: cover;
-  overflow: hidden;
-  border-bottom: solid black 3px;
-  border-bottom-left-radius: 10%;
-  border-bottom-right-radius: 10%;
-  background: rgb(36, 238, 144);
-}
-
-.card_imgcheckPurchase img {
-  width: 7vh;
-  height: 6vh;
-  border: solid rgb(3, 11, 125) 1px;
-}
-
-.card_containcheckPurchase {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  text-align: center;
-  height: 60%;
-  width: 100%;
-  font-size: 0.8rem;
 }

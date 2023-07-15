@@ -1,0 +1,10 @@
+{"level":"warn","message":"Testeando el logger"}
+{"level":"warn","message":"Testeando el logger"}
+{"level":"error","message":"Testeando el logger, error"}
+{"level":"warn","message":"Testeando el logger"}
+{"level":"error","message":"Testeando el logger, error"}
+{"level":"warn","message":"Testeando el logger"}
+{"level":"warn","message":"Testeando el logger, warn"}
+{"level":"error","message":"Testeando el logger, error"}
+{"level":"warn","message":"Testeando el logger, warn"}
+{"level":"error","message":"Testeando el logger, error"}

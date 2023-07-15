@@ -1,6 +1,11 @@
 import { UserDAO, CartDAO, ProductDAO, TicketDAO } from "../dao/index.js";
 import DaoRepository from "../repository/DaoRepository.js";
-import { CartsMG } from "../dao/FileSystem/CartsManager.js";
+import CustomError from "../services/errors/CustomError.js";
+import EErrors from "../services/errors/enum.js";
+import {
+  generateCartErrorInfo,
+  generateAuthErrorInfo,
+} from "../services/errors/info.js";
 
 const repoProduct = new DaoRepository(ProductDAO);
 const repoCart = new DaoRepository(CartDAO);
@@ -8,22 +13,45 @@ const repoUser = new DaoRepository(UserDAO);
 const repoTicket = new DaoRepository(TicketDAO);
 
 const cartController = {
-  getCarts: async (req, res) => {
+  getCarts: async (req, res, next) => {
     try {
       let carts = await repoCart.getData();
+      if (!carts) {
+        CustomError.createError({
+          name: "NotFoundError",
+          cause: "Carts not found in the database",
+          message: "Get carts request failed",
+          code: EErrors.NOT_FOUND_ERROR,
+        });
+      }
       res.sendSuccess(200, carts);
-    } catch (err) {
-      res.sendServerError({ error: err });
+    } catch (error) {
+      next(error);
     }
   },
-  getCartId: async (req, res) => {
+  getCartId: async (req, res, next) => {
     try {
       const cid = req.params.cid;
+      if (!cid || typeof cid !== "string" || cid.length < 1) {
+        CustomError.createError({
+          name: "BadRequestError",
+          cause: `Cid is not valid, it must be a alphanumeric and valid string, received: ${cid}`,
+          message: "Get cartbyID request failed",
+          code: EErrors.BAD_REQUEST_ERROR,
+        });
+      }
       let cart = await repoCart.getDataId(cid);
-      let carts = await repoCart.getData();
+      if (!cart) {
+        CustomError.createError({
+          name: "NotFoundError",
+          cause: "Cart not found in the database",
+          message: "Get cartbyID request failed",
+          code: EErrors.NOT_FOUND_ERROR,
+        });
+      }
       res.sendSuccess(200, cart);
-    } catch (err) {
-      res.sendServerError({ error: err });
+    } catch (error) {
+      next(error);
     }
   },
   getAuth: async (req, res) => {
@@ -33,23 +61,55 @@ const cartController = {
       res.sendServerError({ error: err });
     }
   },
-  addCart: async (req, res) => {
+  addCart: async (req, res, next) => {
     try {
-      const { _id } = req.session.user;
-      const user = await repoUser.getDataId(_id);
       const newCart = req.body;
+      if (!newCart.products) {
+        CustomError.createError({
+          name: "BadRequestError",
+          cause: generateCartErrorInfo({ newCart }),
+          message: "Create newcart request failed",
+          code: EErrors.BAD_REQUEST_ERROR,
+        });
+      }
+      const sessionUser = req.session.user;
+      if (!sessionUser) {
+        CustomError.createError({
+          name: "AuthenticationError",
+          cause: generateAuthErrorInfo({ sessionUser }),
+          message: "Authentication request failed",
+          code: EErrors.AUTHENTICATION_ERROR,
+        });
+      }
+      const user = await repoUser.getDataId(sessionUser._id);
       const response = await repoCart.addData(newCart);
       user.carts.push({ cart: response._id });
-      repoUser.updateData({ _id: _id }, user);
+      repoUser.updateData({ _id: sessionUser._id }, user);
       res.sendSuccess(200, response);
-    } catch (err) {
-      res.sendServerError({ error: err });
+    } catch (error) {
+      next(error);
     }
   },
-  addCartId: async (req, res) => {
+  addCartId: async (req, res, next) => {
     try {
       const cid = req.params.cid;
+      if (!cid || typeof cid !== "string" || cid.length < 1) {
+        CustomError.createError({
+          name: "BadRequestError",
+          cause: `Cid is not valid, it must be a alphanumeric and valid string, received: ${cid}`,
+          message: "Add cartbyID request failed",
+          code: EErrors.BAD_REQUEST_ERROR,
+        });
+      }
       const reqProducts = req.body;
+      if (!reqProducts.products) {
+        CustomError.createError({
+          name: "BadRequestError",
+          cause: generateCartErrorInfo({ reqProducts }),
+          message: "Create newcart request failed",
+          code: EErrors.BAD_REQUEST_ERROR,
+        });
+      }
       const newProducts = reqProducts.products;
       let productsFind = [];
       if (newProducts[0].payload) {
@@ -76,14 +136,30 @@ const cartController = {
           error: "Bad Request--> The cart is not valid",
         });
       }
-    } catch (err) {
-      res.sendServerError({ error: err });
+    } catch (error) {
+      next(error);
     }
   },
-  addCartProductId: async (req, res) => {
+  addCartProductId: async (req, res, next) => {
     try {
       const cid = req.params.cid;
       const pid = req.params.pid;
+      if (!cid || typeof cid !== "string" || cid.length < 1) {
+        CustomError.createError({
+          name: "BadRequestError",
+          cause: `Cart id is not valid, it must be a alphanumeric and valid string, received: ${cid}`,
+          message: "Add productCartbyID request failed",
+          code: EErrors.BAD_REQUEST_ERROR,
+        });
+      }
+      if (!pid || typeof pid !== "string" || pid.length < 1) {
+        CustomError.createError({
+          name: "BadRequestError",
+          cause: `Product id is not valid, it must be a alphanumeric and valid string, received: ${pid}`,
+          message: "Add productCartbyID request failed",
+          code: EErrors.BAD_REQUEST_ERROR,
+        });
+      }
       const responsecid = await repoCart.getDataId(cid);
       const responsepid = await repoProduct.getDatatId(pid);
       if (!isNaN(responsepid) || !isNaN(responsecid)) {
@@ -114,15 +190,15 @@ const cartController = {
         const updateProducts = { products: cartProducts[0] };
         await repoCart.updateData({ _id: cid }, updateProducts);
       }
-    } catch (err) {
-      res.sendServerError({ error: err });
+    } catch (error) {
+      next(error)
     }
   },
   purchaseCart: async (req, res) => {
     try {
-      const data=req.body;
-      const response=repoTicket.addData(data);
-      res.sendSuccess(200,response);
+      const data = req.body;
+      const response = repoTicket.addData(data);
+      res.sendSuccess(200, response);
       /*const stock = req.body.stock;
       const quantity = req.body.quantity;
       const cid = req.params.cid;

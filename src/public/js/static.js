@@ -58,7 +58,7 @@ async function createHtml() {
       html = `<div class="container__grid__card ${error}">
           <div class="card">
             <div class="card-header--filled">
-              <h5 class="card-title--filled">${product.tittle}</h5>
+              <h5 class="card-title--filled">${product.title}</h5>
             </div>
             <img
               class="card-img-top--filled"

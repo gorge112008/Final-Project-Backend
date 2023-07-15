@@ -5,6 +5,7 @@ import UsersRouter from "./routers/api/users.routes.js";
 import ViewsRouter from "./routers/mainRouter.js";
 import SessionsRouter from "./routers/api/sessions.routes.js";
 import CookiesRouter from "./routers/api/cookies.routes.js";
+import TestRouter from "./routers/api/test.routes.js";
 
 const usersRouter = new UsersRouter(),
   sessionsRouter = new SessionsRouter(),
@@ -12,7 +13,8 @@ const usersRouter = new UsersRouter(),
   cartsRouter = new CartsRouter(),
   chatRouter = new ChatRouter(),
   cookiesRouter = new CookiesRouter(),
-  viewsRouter = new ViewsRouter();
+  viewsRouter = new ViewsRouter(),
+  testRouter = new TestRouter();
 
 export const routersManager = {
   usersRouter: usersRouter.Routers(),
@@ -22,4 +24,5 @@ export const routersManager = {
   chatRouter: chatRouter.Routers(),
   cookiesRouter: cookiesRouter.Routers(),
   viewsRouter: viewsRouter.Routers(),
+  testRouter: testRouter.Routers(),
 };

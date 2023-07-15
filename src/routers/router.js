@@ -10,6 +10,12 @@ export default class AppRouter {
     return this.router;
   }
   init() {}
+  getTest(path,...callbacks) {
+    this.router.get(
+      path,
+      this.applyCallbacks(callbacks)
+    );
+  }
 
   getRoute(path, policies, ...callbacks) {
     this.router.get(

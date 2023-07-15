@@ -1,4 +1,5 @@
 import express from "express";
+import compression from "express-compression";
 import config from "./config/config.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -9,11 +10,13 @@ import MongoSingleton from "./utils/mongoSingletonClass.js";
 import MongoStore from "connect-mongo";
 import passport from "passport";
 import session from "express-session";
+import errorHandler from "./middlewares/errors/index.js";
 import { engine } from "express-handlebars";
 import { __dirname } from "./utils.js";
 import { routersManager } from "./routers.js";
 import { initializePassport } from "./config/passport.config.js";
 import { allowInsecurePrototypeAccess } from "@handlebars/allow-prototype-access";
+import { addLogger } from "./utils/logger.js";
 
 const { DB_USER, DB_PASS, CONNECTION_URL } = config.mongo;
 
@@ -24,7 +27,14 @@ const app = express(); //Crear una aplicacion express
     origin: ["http://127.0.0.1:5500"],
   })
 );*/
+app.use(addLogger);
 app.use(cors());
+app.use(
+  compression({
+    brotli: { enabled: true },
+    zlib: {},
+  })
+);
 app.use(cookieParser("S3cr3tC0d3r"));
 app.use(logger("dev"));
 app.use(
@@ -49,13 +59,16 @@ app.use(passport.session());
 app.use("/", routersManager.viewsRouter);
 app.use(
   "/api",
+  routersManager.testRouter,
   routersManager.productsRouter,
   routersManager.cartsRouter,
   routersManager.chatRouter,
   routersManager.usersRouter,
   routersManager.cookiesRouter,
-  routersManager.sessionsRouter
+  routersManager.sessionsRouter,
 );
+app.use(errorHandler);
+
 /*********************************************************************** */
 //    RUTA CUSTOM PARA REVISAR TOKEN JWT DE USUARIO ACTUAL.
 //    localhost:8080/api/sessions/custom
@@ -70,7 +83,7 @@ app.engine(
 );
 app.set("view engine", "handlebars");
 app.set("views", path.join(__dirname, "/views"));
-app.use(express.static(path.join(__dirname,"/public"))); //Configurar el servidor para que pueda entender la ruta de los archivos estaticos
+app.use(express.static(path.join(__dirname, "/public"))); //Configurar el servidor para que pueda entender la ruta de los archivos estaticos
 
 const environment = async () => {
   await MongoSingleton.getInstance(CONNECTION_URL);

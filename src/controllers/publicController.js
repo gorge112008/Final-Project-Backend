@@ -68,7 +68,7 @@ const publicController = {
       user: email,
       body: publicMessages,
     });
-  },
+  }
 };
 
 export default publicController;

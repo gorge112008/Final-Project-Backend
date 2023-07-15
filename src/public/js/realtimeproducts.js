@@ -13,7 +13,7 @@ let storeProducts = [],
 let query = {};
 
 const contain = document.querySelector(".container__grid"),
-  tittleDinamic = document.querySelector(".dinamic__tittle--addProduct"),
+  titleDinamic = document.querySelector(".dinamic__title--addProduct"),
   form = document.querySelector("form"),
   formInput = document.querySelectorAll(".input-field label"),
   formCancel = document.querySelector(".form--btnCancel");
@@ -23,7 +23,7 @@ const dinamicPages = document.querySelector(".dinav__pages--center"),
   selectNextPage = document.getElementById("page__btnDer");
 
 const validateProducts = document.getElementById("validate"),
-  inputTittle = document.getElementById("tittle"),
+  inputTitle = document.getElementById("title"),
   inputDescription = document.getElementById("description"),
   inputCode = document.getElementById("code"),
   inputPrice = document.getElementById("price"),
@@ -38,7 +38,7 @@ const validateProducts = document.getElementById("validate"),
 
 class NewProduct {
   constructor() {
-    this.tittle = inputTittle.value;
+    this.title = inputTitle.value;
     this.description = inputDescription.value;
     this.code = +inputCode.value;
     this.status = "success";
@@ -99,7 +99,7 @@ async function crearHtml() {
       html = `<div class="container__grid__card ${error}">
           <div class="card">
             <div class="card-header--filled">
-              <h5 class="card-title--filled">${product.tittle}</h5>
+              <h5 class="card-title--filled">${product.title}</h5>
             </div>
             <img
               class="card-img-top--filled"
@@ -156,8 +156,8 @@ function validarUrl() {
 async function selectAction() {
   if (RouteIndex === "realTP/") {
     categoryOption.value = storeProducts[0].category;
-    tittleDinamic.innerHTML = "Update Product";
-    inputTittle.value = storeProducts[0].tittle;
+    titleDinamic.innerHTML = "Update Product";
+    inputTitle.value = storeProducts[0].title;
     inputDescription.value = storeProducts[0].description;
     inputCode.value = storeProducts[0].code;
     inputPrice.value = storeProducts[0].price;
@@ -168,7 +168,7 @@ async function selectAction() {
     });
     if (opc == "static") {
       await updateData(storeProducts[0]._id, { status: "error" });
-      socket.emit("updatingProduct", storeProducts[0].tittle + " updating...");
+      socket.emit("updatingProduct", storeProducts[0].title + " updating...");
       opc = "updating";
     } else {
       selectDelete();
@@ -189,7 +189,7 @@ async function selectDelete() {
           Swal.fire({
             title:
               "YOU WANT TO DELETE THE PRODUCT " +
-              productSelect[0].tittle.toUpperCase() +
+              productSelect[0].title.toUpperCase() +
               " ?",
             showDenyButton: true,
             showCancelButton: false,
@@ -209,7 +209,7 @@ async function selectDelete() {
                         "ID: " +
                         data.sessionData +
                         " --> " +
-                        productSelect[0].tittle,
+                        productSelect[0].title,
                       icon: "success",
                       showConfirmButton: confirm,
                       allowOutsideClick: false,
@@ -250,7 +250,7 @@ async function selectDelete() {
           selectCategory.value == ""
             ? (categoryOption.value = "Food")
             : (categoryOption.value = selectCategory.value);
-          inputTittle.focus();
+          inputTitle.focus();
         } else if (
           formAddProduct.className == "dinamic__container--addProduct"
         ) {
@@ -323,7 +323,7 @@ function saveUpdate(product) {
           if (data.status === 200) {
             Swal.fire({
               position: "center",
-              text: "Updated Product: " + product.tittle,
+              text: "Updated Product: " + product.title,
               icon: "success",
               title: "Product Update Successfully!",
               showConfirmButton: false,
@@ -839,7 +839,7 @@ form.addEventListener("submit", async (e) => {
                 filters();
                 Swal.fire({
                   title: "Product Added Successfully!",
-                  text: "Registered Product: " + data.sessionData.tittle,
+                  text: "Registered Product: " + data.sessionData.title,
                   icon: "success",
                   confirmButtonText: "Accept",
                 });

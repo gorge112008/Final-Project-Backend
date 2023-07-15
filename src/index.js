@@ -2,7 +2,7 @@ import app from "./app.js";
 import initSocketServer from "./socket.js";
 import config from "./config/config.js";
 
-const server = app.listen(config.mongo.port, () => {
+const server = app.listen(config.mongo.port, (req) => {
   console.log("Server up in port", config.mongo.port);
 });
 

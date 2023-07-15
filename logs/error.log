@@ -1,0 +1,111 @@
+{"level":"error","message":"Testeando el logger, error"}
+{"level":"error","message":"Testeando el logger, error"}
+{"level":"error","message":"Testeando el logger, error"}
+{"level":"error","message":"Testeando el logger, error"}
+fatal: GET en /test - 2023-07-15T03:36:08.610Z
+fatal: GET en /test - 2023-07-15T03:37:55.471Z
+fatal: GET en /test - 2023-07-15T03:42:34.531Z
+fatal: GET en /test - 2023-07-15T03:43:11.660Z
+fatal: GET en /test - 2023-07-15T03:43:35.564Z
+error: GET en /test - 2023-07-15T03:43:35.567Z
+error: Testeando el logger, error
+fatal: Testeando el logger, fatal
+fatal: GET en /test - 2023-07-15T03:43:53.268Z
+fatal: GET en /test - 2023-07-15T03:44:18.339Z
+error: GET en /test - 2023-07-15T03:44:18.342Z
+error: Testeando el logger, error
+fatal: Testeando el logger, fatal
+fatal: GET en /test - 2023-07-15T03:44:42.531Z
+error: GET en /test - 2023-07-15T03:44:42.534Z
+error: Testeando el logger, error
+fatal: Testeando el logger, fatal
+fatal: GET en /test - 2023-07-15T03:45:27.308Z
+error: GET en /test - 2023-07-15T03:45:27.311Z
+error: Testeando el logger, error
+fatal: Testeando el logger, fatal
+fatal: GET en /test - 2023-07-15T03:45:52.019Z
+error: GET en /test - 2023-07-15T03:45:52.022Z
+error: Testeando el logger, error
+fatal: Testeando el logger, fatal
+fatal: GET en /test - 2023-07-15T03:46:18.940Z
+error: GET en /test - 2023-07-15T03:46:18.943Z
+error: Testeando el logger, error
+fatal: Testeando el logger, fatal
+error: Testeando el logger, error
+fatal: Testeando el logger, fatal
+error: Testeando el logger, error
+fatal: Testeando el logger, fatal
+error: Testeando el logger, error
+fatal: Testeando el logger, fatal
+error: Testeando el logger, error
+fatal: Testeando el logger, fatal
+error: Testeando el logger, error
+error: ERROR--> CustomError is not defined: 
+undefined
+error: ERROR--> Failed generated users: 
+Error generating users
+error: ERROR--> Failed generated users: 
+Error generating users
+fatal: Need Attention Priority 1: PAYMENT_REQUIRED_ERROR
+error: ERROR--> Operation `users.findOne()` buffering timed out after 10000ms: 
+undefined
+error: ERROR--> getaddrinfo ENOTFOUND ac-3rmd24l-shard-00-01.xq93twh.mongodb.net: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> logger is not defined: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> policies.includes is not a function: 
+undefined
+error: ERROR--> generateUser is not defined: 
+undefined

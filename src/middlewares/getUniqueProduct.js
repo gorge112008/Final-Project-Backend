@@ -4,8 +4,8 @@ import DaoRepository from "../repository/DaoRepository.js";
 const repoProduct = new DaoRepository(ProductDAO);
 
 const UniqueGetProduct = async (req, res, next) => {
+  const query = req.query; // Valor predeterminado de 10
   try {
-    const query = req.query; // Valor predeterminado de 10
     const product = await repoProduct.getDataUnique(query);
     res.locals.products = product;
     next();

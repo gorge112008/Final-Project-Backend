@@ -31,7 +31,6 @@ export default class CartsDao {
     return body;
   }
   async deleteCart(id) {
-    console.log("LLEGA +" + id);
     const index = this.data.findIndex((c) => c._id == id);
     this.data.splice(index, 1);
     return { id };

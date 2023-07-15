@@ -79,6 +79,7 @@ const sessionController = {
         maxAge: 60 * 60 * 1000,
         signed: true,
       });
+      console.log(`Ingreso de ${session.email} satisfactorio`);
       res.sendSuccess(200, {
         success: msj,
         session: session,
@@ -92,12 +93,13 @@ const sessionController = {
   postSignup: async (req, res) => {
     try {
       if (req.user && !req.user.error) {
-        senderMail
+        /*senderMail
           .SenderWelcome(req.user)
           .then((dat) => {
             console.log(dat);
           })
-          .catch((err) => console.log(err));
+          .catch((err) => console.log(err));*/
+        console.log(`El registro de ${req.user.email} fue exitoso`);
         const msj = {
           success: `Email ${req.user.email} successfully registered`,
         };

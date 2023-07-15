@@ -24,7 +24,7 @@ let storeCarts = [],
 let query = {};
 
 const staticContain = document.querySelector(".static__container--cart"),
-  titleCart = document.querySelector(".static__tittleCart"),
+  titleCart = document.querySelector(".static__titleCart"),
   containCart = document.querySelector(".container__cart"),
   purchaseCart = document.querySelector(".purchaseCart"),
   purchaseWarn = document.querySelector(".purchaseWarn");
@@ -295,7 +295,7 @@ async function crearHTMLProductsCarts() {
       html = `<div class="container__grid__card">
           <div class="card">
             <div class="card-header--filled">
-              <h5 class="card-title--filled">${product.tittle}</h5>
+              <h5 class="card-title--filled">${product.title}</h5>
             </div>
             <div class="card-img--filled">
             <img
@@ -472,7 +472,7 @@ async function selectBtnCartProducts() {
           const { productSelect, listStock } = validProduct;
           if (listStock) {
             Swal.fire({
-              html: `How many ${productSelect[0].product.tittle} do you want to add to the cart?`,
+              html: `How many ${productSelect[0].product.title} do you want to add to the cart?`,
               input: "select",
               inputOptions: listStock,
               footer:
@@ -497,7 +497,7 @@ async function selectBtnCartProducts() {
                         title: "Product(s) Added Successfully!!!",
                         text:
                           "Product Added>> " +
-                          productSelect[0].product.tittle +
+                          productSelect[0].product.title +
                           " -->Quantity: " +
                           selectValue,
                         icon: "success",
@@ -506,7 +506,7 @@ async function selectBtnCartProducts() {
                       socket.emit("updateproduct", "Updated Products");
                       socket.emit(
                         "addingProductCart",
-                        `Has been added ${selectValue} ${productSelect[0].product.tittle} al carrito.`
+                        `Has been added ${selectValue} ${productSelect[0].product.title} al carrito.`
                       );
                     } else if (data.status === 401 || 403 || 404) {
                       console.warn("Client authorization expired or invalid");
@@ -536,7 +536,7 @@ async function selectBtnCartProducts() {
           const validProduct = await validDelProduct(idCart, idProduct);
           const { productSelect, listStock } = validProduct;
           Swal.fire({
-            html: `How many ${productSelect[0].product.tittle} do you want to delete to the cart?`,
+            html: `How many ${productSelect[0].product.title} do you want to delete to the cart?`,
             input: "select",
             inputOptions: listStock,
             showDenyButton: true,
@@ -560,7 +560,7 @@ async function selectBtnCartProducts() {
                       title: "Product(s) Deleted Successfully!!!",
                       text:
                         "Product Deleted>> " +
-                        productSelect[0].product.tittle +
+                        productSelect[0].product.title +
                         " -->Quantity: " +
                         selectValue,
                       icon: "success",
@@ -569,7 +569,7 @@ async function selectBtnCartProducts() {
                     socket.emit("updateproduct", "Updated Products");
                     socket.emit(
                       "deletingProductCart",
-                      `Has been removed ${selectValue} ${productSelect[0].product.tittle} del carrito.`
+                      `Has been removed ${selectValue} ${productSelect[0].product.title} del carrito.`
                     );
                   } else if (data.status === 401 || 403 || 404) {
                     console.warn("Client authorization expired or invalid");
@@ -625,7 +625,7 @@ async function selectBtnCartProducts() {
                         socket.emit("updateproduct", "Updated Products");
                         socket.emit(
                           "removeProduct",
-                          `The Product ${productSelect[0].tittle} has been removed from cart`
+                          `The Product ${productSelect[0].title} has been removed from cart`
                         );
                       })
                       .catch((error) => console.log("Error:" + error));
@@ -1200,7 +1200,7 @@ async function createListProductsFailed(idCart) {
       <div class="card col s12">
         <div class="card_cart--header row noMargin">
           <div class="cart-header--filled col s12">
-            <h5 class="checkPurchase-title--filled">${product.product.tittle} </h5>
+            <h5 class="checkPurchase-title--filled">${product.product.title} </h5>
           </div>
         </div>
         <div class="card_checkPurchase--body row noMargin">
@@ -1263,7 +1263,7 @@ async function createListProductsPurchase(idCart) {
       <div class="card col s12">
         <div class="card_cart--header row noMargin">
           <div class="cart-header--filled col s12">
-            <h5 class="checkPurchase-title--filled">${product.product.tittle} </h5>
+            <h5 class="checkPurchase-title--filled">${product.product.title} </h5>
           </div>
         </div>
         <div class="card_checkPurchase--body row noMargin">

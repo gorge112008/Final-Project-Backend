@@ -1,6 +1,6 @@
 [
   {
-    "tittle": "Burger",
+    "title": "Burger",
     "description": "Meat Hamburger",
     "code": 1,
     "price": 10,
@@ -11,7 +11,7 @@
     "id": 3
   },
   {
-    "tittle": "Pizza",
+    "title": "Pizza",
     "description": "Meat Pizza",
     "code": 2,
     "price": 400,
@@ -22,7 +22,7 @@
     "id": 4
   },
   {
-    "tittle": "tomate",
+    "title": "tomate",
     "description": "ala Mexicana",
     "code": 123,
     "status": true,
@@ -33,7 +33,7 @@
     "id": 9
   },
   {
-    "tittle": "Pan",
+    "title": "Pan",
     "description": "Calientito",
     "code": 41,
     "status": true,
@@ -44,7 +44,7 @@
     "id": 10
   },
   {
-    "tittle": "Alcena",
+    "title": "Alcena",
     "description": "Lo mismo pero mas caro?",
     "code": 88,
     "status": true,
@@ -55,7 +55,7 @@
     "id": 13
   },
   {
-    "tittle": "Ajo",
+    "title": "Ajo",
     "description": "Solo falta el pan",
     "code": 42,
     "status": true,
@@ -66,7 +66,7 @@
     "id": 14
   },
   {
-    "tittle": "Pizza portofino",
+    "title": "Pizza portofino",
     "description": "Langostinos, jamón, salsa de tomate y mozarella",
     "code": 14,
     "status": true,
@@ -77,7 +77,7 @@
     "id": 15
   },
   {
-    "tittle": "FAS",
+    "title": "FAS",
     "description": "sadas",
     "code": 333,
     "status": true,
